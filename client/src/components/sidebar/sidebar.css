@@ -1,0 +1,49 @@
+.sidebar {
+  flex: 2.6;
+  height: calc(100vh-50px);
+}
+
+.sidebarWrapper {
+  padding: 20px;
+}
+
+.sidebarList {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sidebarIcon {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.pfp {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.username {
+  margin-left: 30px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.modules {
+  position: relative;
+}
+
+.moreButton {
+  position: absolute;
+  cursor: pointer;
+}
+
+.interestGroups {
+  margin-top: 40px;
+}
