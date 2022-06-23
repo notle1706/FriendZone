@@ -28,6 +28,7 @@ export default function Feed() {
           Post
         </Button>
       </div>
+      <div className="newsFeed">News Feed</div>
     </div>
   );
 }

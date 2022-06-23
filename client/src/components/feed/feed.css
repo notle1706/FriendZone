@@ -26,7 +26,7 @@
   overflow: hidden;
   min-height: 40px;
   resize: vertical;
-  position: absolute;
+  position: relative;
   height: 30px;
   width: 400px;
   margin-left: 40px;
@@ -70,8 +70,12 @@
 }
 
 .button {
-  position: flex;
+  position: relative;
   height: 30px;
-  left: 440px;
   top: 86px;
+}
+
+.newsFeed {
+  border: 1px solid black;
+  height: 100%;
 }
