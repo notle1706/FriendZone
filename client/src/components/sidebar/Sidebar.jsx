@@ -1,43 +1,54 @@
+import React, { useState } from "react";
 import "./sidebar.css";
-import Button from "@mui/material/Button";
+import { Menu, Close } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { SidebarData } from "./SidebarData";
+import Fab from "@mui/material/Fab";
 
 export default function Sidebar() {
-  return (
-    <div className="sidebar">
-      <div className="sidebarWrapper">
-        <img src="src\assets\person\pfp.jpg" alt="" className="pfp" />
-        <span className="profileName">Nick West</span>
+  {
+    /* setSidebar is a hook that toggles the sidebar */
+  }
+  const [sidebar, setSidebar] = useState(false);
+  const showSidebar = () => setSidebar(!sidebar);
 
-        <div className="username">@amongus</div>
-        <ul className="sidebarList">
-          <li className="sidebarIcon">Home</li>
-          <li className="sidebarIcon">People</li>
-          <li className="sidebarIcon">Groups</li>
-          <li className="sidebarIcon">Messages</li>
-          <li className="sidebarIcon">Settings</li>
+  {
+    /* Each item in the sidebar should light up when
+     that particular page is being accessed. 
+     Not implimented yet*/
+  }
+  const [clicked, setClicked] = useState(false);
+  const clickItem = () => setClicked(true);
+
+  return (
+    <>
+      {/* The button which toggles the sidebar*/}
+      <Link to="#" className="menu-bars">
+        <Fab color="primary" aria-label="add">
+          <Menu className="menu" onClick={showSidebar} />
+        </Fab>
+      </Link>
+
+      {/* Shows the sidebar if it is active*/}
+      <nav className={sidebar ? "nav-menu active" : "nav-menu"}>
+        {/* We capture the items in the sidebar using a list */}
+        <ul className="nav-menu-items list-group ">
+          {SidebarData.map((item, index) => {
+            return (
+              <li
+                key={index}
+                className={clicked ? item.cName + " active" : item.cName}
+                onClick={clickItem}
+              >
+                <Link to={item.path}>
+                  {item.icon}
+                  <span>{item.title}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
-      </div>
-      <div className="moduleWrapper">
-        <div className="modules">
-          Modules
-          <span className="moreButton">...</span>
-        </div>
-        <div className="btnGroup">
-          <button>CN3222</button>
-          <button>CS1231</button>
-          <button>FIN2704</button>
-          <button>FSP4003</button>
-          <button>DBA4811</button>
-        </div>
-      </div>
-      <div className="interestGroups">
-        Interest Groups<span className="moreButton">...</span>
-      </div>
-      <div className="btnGroup">
-        <button>Piano</button>
-        <button>Stage</button>
-        <button>StartIT</button>
-      </div>
-    </div>
+      </nav>
+    </>
   );
 }

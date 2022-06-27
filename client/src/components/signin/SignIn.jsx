@@ -1,7 +1,52 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import "./signin.css";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../../firebase";
+import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
-export default function (props) {
+export default function SignIn(props) {
+  let navigate = useNavigate();
+
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  function sError(str) {
+    setLoading(true);
+    return setError(str);
+  }
+
+  const register = async () => {
+    if (registerPassword !== confirmPassword) {
+      sError("Passwords do not match");
+      return;
+    }
+    createUserWithEmailAndPassword(auth, registerEmail, registerPassword)
+      .then((auth) => {
+        console.log(auth);
+      })
+      .catch((error) => sError(error.message));
+  };
+
+  const login = async () => {
+    signInWithEmailAndPassword(auth, loginEmail, loginPassword)
+      .then((auth) => {
+        navigate("/dashboard/home");
+      })
+      .catch((error) => sError(error.message));
+  };
+
+  const logout = async () => {};
+
   let [authMode, setAuthMode] = useState("signin");
 
   const changeAuthMode = () => {
@@ -26,6 +71,10 @@ export default function (props) {
                 type="email"
                 className="form-control mt-1"
                 placeholder="Enter email"
+                onChange={(event) => {
+                  setLoading(false);
+                  setLoginEmail(event.target.value);
+                }}
               />
             </div>
             <div className="form-group mt-3">
@@ -34,16 +83,26 @@ export default function (props) {
                 type="password"
                 className="form-control mt-1"
                 placeholder="Enter password"
+                onChange={(event) => {
+                  setLoading(false);
+                  setLoginPassword(event.target.value);
+                }}
               />
             </div>
             <div className="d-grid gap-2 mt-3">
-              <button type="submit" className="btn btn-primary">
+              <button
+                type="button"
+                disabled={loading}
+                className="btn btn-primary"
+                onClick={login}
+              >
                 Submit
               </button>
             </div>
             <p className="text-center mt-2">
               Forgot <a href="#">password?</a>
             </p>
+            <p className="text-center mt-2 text-danger">{error}</p>
           </div>
         </form>
       </div>
@@ -63,11 +122,7 @@ export default function (props) {
           </div>
           <div className="form-group mt-3">
             <label>Full Name</label>
-            <input
-              type="email"
-              className="form-control mt-1"
-              placeholder="e.g Jane Doe"
-            />
+            <input className="form-control mt-1" placeholder="e.g Jane Doe" />
           </div>
           <div className="form-group mt-3">
             <label>Email address</label>
@@ -75,6 +130,10 @@ export default function (props) {
               type="email"
               className="form-control mt-1"
               placeholder="Email Address"
+              onChange={(event) => {
+                setLoading(false);
+                setRegisterEmail(event.target.value);
+              }}
             />
           </div>
           <div className="form-group mt-3">
@@ -83,16 +142,38 @@ export default function (props) {
               type="password"
               className="form-control mt-1"
               placeholder="Password"
+              onChange={(event) => {
+                setLoading(false);
+                setRegisterPassword(event.target.value);
+              }}
+            />
+          </div>
+          <div className="form-group mt-3">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              className="form-control mt-1"
+              placeholder="Enter password"
+              onChange={(event) => {
+                setLoading(false);
+                setConfirmPassword(event.target.value);
+              }}
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="button"
+              onClick={register}
+              disabled={loading}
+              className="btn btn-primary"
+            >
               Submit
             </button>
           </div>
           <p className="text-center mt-2">
             Forgot <a href="#">password?</a>
           </p>
+          <p className="text-center mt-2 text-danger">{error}</p>
         </div>
       </form>
     </div>

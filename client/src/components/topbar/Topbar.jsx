@@ -1,51 +1,49 @@
 import "./topbar.css";
 import React, { useState } from "react";
-import SearchIcon from "@mui/icons-material/Search";
-import PersonIcon from "@mui/icons-material/Person";
-import ChatIcon from "@mui/icons-material/Chat";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { Search, Person, Chat, Notifications } from "@mui/icons-material";
 
 function Topbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   return (
-    <div className="topbarContainer">
-      <div className="topbarLeft">
-        <span className="logo">FriendZone</span>
-      </div>
-      <>
-        {loggedIn ? (
-          <>
-            <div className="topbarCenter">
-              <div className="searchBar">
-                <SearchIcon className="searchIcon" />
-                <input
-                  placeholder="Search for friend, post, or module"
-                  className="searchInput"
-                />
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-3">
+          <span className="logo">FriendZone</span>
+        </div>
+        <>
+          {loggedIn ? (
+            <>
+              <div className="col-5">
+                <div className="input-group rounded mt-1">
+                  <input
+                    type="search"
+                    className="form-control rounded"
+                    placeholder="Search for modules, people, and groups"
+                    aria-label="Search"
+                    aria-describedby="search-addon"
+                  />
+                  <Search id="search-addon" />
+                </div>
               </div>
-            </div>
-            <div className="topbarRight">
-              <div className="topbarLinks">
-                <span className="topbarLink">Profile</span>
-              </div>
-              <div className="topbarIcons">
+              <div className="col-1"></div>
+              <div className="topbarIcons col-3 justify-content-end">
                 <div className="topbarIconItem">
-                  <PersonIcon />
+                  <Person />
                   <span className="topbarIconBadge">1</span>
                 </div>
                 <div className="topbarIconItem">
-                  <ChatIcon />
+                  <Chat />
                   <span className="topbarIconBadge">2</span>
                 </div>
                 <div className="topbarIconItem">
-                  <NotificationsIcon />
+                  <Notifications />
                   <span className="topbarIconBadge">1</span>
                 </div>
               </div>
-            </div>
-          </>
-        ) : null}
-      </>
+            </>
+          ) : null}
+        </>
+      </div>
     </div>
   );
 }

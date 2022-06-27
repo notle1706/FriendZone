@@ -1,49 +1,58 @@
-.sidebar {
-  flex: 2.6;
-  height: calc(100vh-50px);
+.nav-menu {
+  z-index: 8;
+  height: 100%;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  background-color: rgb(74, 140, 158);
+  top: 0;
+  left: 100%;
 }
 
-.sidebarWrapper {
-  padding: 20px;
+.menu {
+  z-index: 9;
 }
 
-.sidebarList {
-  padding: 0;
-  margin: 0;
+.nav-menu.active {
+  left: 0%;
+}
+
+.nav-menu-items {
+}
+
+.menu-bars {
+  z-index: 9;
+  position: fixed;
+  color: rgb(179, 173, 173);
+  margin-left: 2rem;
+  font-size: 2rem;
+  background: none;
+}
+
+.nav-text {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 8px 0px 8px 16px;
   list-style: none;
+  height: 60px;
 }
 
-.sidebarIcon {
+.nav-text a {
+  text-decoration: none;
+  color: #f5f5f5;
+  font-size: 18px;
+  width: 95%;
+  height: 100%;
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-  margin-left: 20px;
-  cursor: pointer;
 }
 
-.pfp {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
+.nav-menu-items {
+  padding-top: 100px;
 }
 
-.username {
-  margin-left: 30px;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-.modules {
-  position: relative;
-}
-
-.moreButton {
-  position: absolute;
-  cursor: pointer;
-}
-
-.interestGroups {
-  margin-top: 40px;
+span {
+  margin-left: 16px;
 }
