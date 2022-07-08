@@ -1,17 +1,27 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import "./signin.css";
-import { useAuth } from "../../contexts/AuthContext";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, addUser } from "../../firebase";
 import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
 export default function SignIn(props) {
+  var currentUser = "";
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      currentUser = user;
+      console.log("user is logged in", currentUser);
+    } else {
+      console.log("user is logged out");
+    }
+  });
   let navigate = useNavigate();
 
+  const [fullName, setFullName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [loginEmail, setLoginEmail] = useState("");
@@ -31,21 +41,28 @@ export default function SignIn(props) {
       return;
     }
     createUserWithEmailAndPassword(auth, registerEmail, registerPassword)
-      .then((auth) => {
-        console.log(auth);
+      .then((userCredentials) => {
+        addUser(fullName, registerEmail);
+        updateProfile(userCredentials.user, { displayName: fullName })
+          .then(() => console.log("Profile updated!"))
+          .catch((e) => console.log(e.message));
+        console.log(userCredentials.user.displayName);
+        signInWithEmailAndPassword(auth, registerEmail, registerPassword)
+          .then((userCredentials) => {
+            navigate("/dashboard/home");
+          })
+          .catch((error) => sError(error.message));
       })
       .catch((error) => sError(error.message));
   };
 
   const login = async () => {
     signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-      .then((auth) => {
+      .then((userCredentials) => {
         navigate("/dashboard/home");
       })
       .catch((error) => sError(error.message));
   };
-
-  const logout = async () => {};
 
   let [authMode, setAuthMode] = useState("signin");
 
@@ -122,7 +139,14 @@ export default function SignIn(props) {
           </div>
           <div className="form-group mt-3">
             <label>Full Name</label>
-            <input className="form-control mt-1" placeholder="e.g Jane Doe" />
+            <input
+              className="form-control mt-1"
+              onChange={(event) => {
+                setLoading(false);
+                setFullName(event.target.value);
+              }}
+              placeholder="e.g Jane Doe"
+            />
           </div>
           <div className="form-group mt-3">
             <label>Email address</label>

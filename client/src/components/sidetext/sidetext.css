@@ -1,4 +1,9 @@
 .image {
-  height: 100%;
-  width: 100%;
+  padding-top: 50px;
+  height: 60%;
+  width: 80%;
+}
+
+.text {
+  color: #23395b;
 }
