@@ -10,6 +10,7 @@ import {
   setDoc,
   getDoc,
   updateDoc,
+  getDocs,
 } from "firebase/firestore";
 import { React, useEffect, useState, useContext, createContext } from "react";
 
@@ -84,6 +85,11 @@ export async function setUserInfo(user, info, newInfo) {
   } catch (e) {
     console.error("Error changing document: ", e);
   }
+}
+
+export async function getPosts() {
+  const snapshot = await getDocs(collection(firestore, "posts"));
+  return snapshot;
 }
 
 export default app;
