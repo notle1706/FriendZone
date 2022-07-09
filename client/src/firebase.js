@@ -11,6 +11,7 @@ import {
   getDoc,
   updateDoc,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 import { React, useEffect, useState, useContext, createContext } from "react";
 
@@ -90,6 +91,77 @@ export async function setUserInfo(user, info, newInfo) {
 export async function getPosts() {
   const snapshot = await getDocs(collection(firestore, "posts"));
   return snapshot;
+}
+
+export async function getPost(postId) {
+  try {
+    const docRef = doc(firestore, "posts", postId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    return data;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function getRawPost(postId) {
+  try {
+    const docRef = doc(firestore, "posts", postId);
+    return docRef;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function newPost(email, title, course, briefDescription, body) {
+  try {
+    const docRef = await addDoc(collection(firestore, "posts"), {
+      title: title,
+      course: course,
+      userEmail: email,
+      briefDescription: briefDescription,
+      body: body,
+      dateCreated: Timestamp.now(),
+      likeCout: 0,
+      viewCount: 0,
+      comments: [],
+    });
+    console.log("Document written with ID: ", docRef.id);
+    await updateDoc(docRef, {
+      id: docRef.id,
+    });
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+export async function newComment(email, body) {
+  try {
+    const docRef = await addDoc(collection(firestore, "comments"), {
+      userEmail: email,
+      body: body,
+      dateCreated: Timestamp.now(),
+      likeCount: 0,
+    });
+    console.log("Document written with ID: ", docRef.id);
+    updateDoc(docRef, {
+      id: docRef.id,
+    });
+    return docRef.id;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+export async function getComment(id) {
+  try {
+    const docRef = doc(firestore, "comments", id);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    return data;
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 export default app;

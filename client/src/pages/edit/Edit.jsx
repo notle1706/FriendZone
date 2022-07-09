@@ -231,7 +231,7 @@ export default function Edit() {
                   <button
                     class="btn btn-primary"
                     type="button"
-                    onClick={submitChanges()}
+                    onClick={submitChanges}
                   >
                     Save changes
                   </button>

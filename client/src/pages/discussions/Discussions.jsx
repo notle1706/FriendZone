@@ -1,10 +1,29 @@
 import React, { useState } from "react";
 import "./discussions.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Posts from "../posts/posts";
+import Posts from "../../components/posts/Posts";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
+import { newPost, getUserEmail } from "../../firebase";
 
 function Discussions() {
-  const [open, setOpen] = useState(false);
+  const [showmodal, setShowmodal] = useState(false);
+  const handleClose = () => setShowmodal(false);
+  const handleShow = () => setShowmodal(true);
+  const [title, setTitle] = useState();
+  const [course, setCourse] = useState();
+  const [desc, setDesc] = useState();
+  const [discbody, setDiscbody] = useState();
+
+  async function createPost() {
+    const userEmail = await getUserEmail();
+
+    await newPost(userEmail, title, course, desc, discbody);
+  }
+
   return (
     <>
       <link
@@ -23,8 +42,7 @@ function Discussions() {
                 <button
                   className="btn btn-primary has-icon btn-block"
                   type="button"
-                  data-toggle="modal"
-                  data-target="#threadModal"
+                  onClick={handleShow}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -204,14 +222,72 @@ function Discussions() {
           </div>
 
           {/* New Thread Modal */}
-          <div
-            className="modal fade"
-            id="threadModal"
-            tabIndex="-1"
-            role="dialog"
-            aria-labelledby="threadModalLabel"
-            aria-hidden="true"
-          ></div>
+          <Modal
+            size="lg"
+            show={showmodal}
+            onHide={handleClose}
+            backdrop="static"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>New discussion</Modal.Title>
+            </Modal.Header>
+            <Form>
+              <Modal.Body>
+                <Row className="g-2">
+                  <Col md>
+                    <Form.Group
+                      onChange={(event) => setTitle(event.target.value)}
+                      className="mb-3"
+                      controlId="discussionArea"
+                    >
+                      <Form.Label>Title</Form.Label>
+                      <Form.Control />
+                    </Form.Group>
+                  </Col>
+                  <Col md>
+                    <Form.Group
+                      onChange={(event) => setCourse(event.target.value)}
+                      className="mb-3"
+                      controlId="discussionArea"
+                    >
+                      <Form.Label>Course</Form.Label>
+                      <Form.Control />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Form.Group
+                  onChange={(event) => setDesc(event.target.value)}
+                  className="mb-3"
+                  controlId="discussionArea"
+                >
+                  <Form.Label>Brief description</Form.Label>
+                  <Form.Control as="textarea" rows={1} />
+                </Form.Group>
+                <Form.Group
+                  onChange={(event) => setDiscbody(event.target.value)}
+                  className="mb-3"
+                  controlId="discussionArea"
+                >
+                  <Form.Label>Discuss!</Form.Label>
+                  <Form.Control as="textarea" rows={3} />
+                </Form.Group>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Close
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    createPost();
+                    handleClose();
+                  }}
+                >
+                  Save Changes
+                </Button>
+              </Modal.Footer>
+            </Form>
+          </Modal>
         </div>
       </div>
     </>

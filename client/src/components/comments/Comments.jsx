@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "./posts.css";
-import { getPosts } from "../../firebase";
+import { Link } from "react-router-dom";
+import "./comments.css";
+import { getComment } from "../../firebase";
 import { DocumentSnapshot, toDate } from "firebase/firestore";
 
-export function PostList(props) {
+export function CommentsList(props) {
   return (
     <>
       <div className="inner-main-body p-2 p-sm-3 forum-content">
@@ -21,15 +22,10 @@ export function PostList(props) {
               <div className="media-body ml-3">
                 <a className="text-secondary">{props.userEmail}</a>
                 <small className="text-muted ml-2">{props.dateCreated}</small>
-                <h5 className="mt-1">{props.title}</h5>
-                <div className="mt-3 font-size-sm">
-                  {props.briefDescription}
-                </div>
+
+                <div className="mt-3 font-size-sm">{props.body}</div>
               </div>
               <div className="text-muted small text-center">
-                <span className="d-none d-sm-inline-block">
-                  <i className="far fa-eye"></i> {props.viewCount}
-                </span>
                 <span>
                   <i className="far fa-comment ml-2"></i> {props.likeCount}
                 </span>
@@ -42,28 +38,26 @@ export function PostList(props) {
   );
 }
 
-export default function Posts() {
-  const [snapshot, setSnapshot] = useState();
-  const [postsData, setPostsdata] = useState([]);
+export default function Comments(props) {
+  const [commentsData, setCommentsdata] = useState([]);
   useEffect(() => {
     const testFunction = async () => {
-      const snapshot = await getPosts();
-      setSnapshot(snapshot);
-      snapshot.forEach((doc) => {
-        let props = {
-          userEmail: doc.data().userEmail,
-          dateCreated: doc.data().dateCreated.toDate().toString(),
-          title: doc.data().title,
-          briefDescription: doc.data().briefDescription,
-          viewCount: doc.data().viewCount,
-          likeCount: doc.data().likeCount,
-        };
-        setPostsdata((arr) => [...arr, <PostList {...props} />]);
+      props.comments.forEach((docId) => {
+        (async () => {
+          const doc = await getComment(docId);
+          console.log(doc);
+          let props = {
+            userEmail: doc.userEmail,
+            dateCreated: doc.dateCreated.toDate().toString(),
+            body: doc.body,
+            likeCount: doc.likeCount,
+          };
+          setCommentsdata((arr) => [...arr, <CommentsList {...props} />]);
+        })();
       });
     };
     testFunction();
-  }, []);
-  console.log(postsData);
+  }, [props.comments]);
 
-  return <>{postsData.map((post) => post)}</>;
+  return <>{commentsData.map((post) => post)}</>;
 }

@@ -31,15 +31,17 @@ function Dashboard() {
   };
   return (
     <>
-      <Sidebar />
-      <button
-        type="button"
-        className="btn btn-secondary float-right logout-button"
-        onClick={logout}
-      >
-        <Logout />
-      </button>
-      <Outlet />
+      <div className="dashboard">
+        <Sidebar />
+        <button
+          type="button"
+          className="btn btn-secondary float-right logout-button"
+          onClick={logout}
+        >
+          <Logout />
+        </button>
+        <Outlet />
+      </div>
     </>
   );
 }
