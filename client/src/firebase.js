@@ -113,12 +113,12 @@ export async function getRawPost(postId) {
   }
 }
 
-export async function newPost(email, title, course, briefDescription, body) {
+export async function newPost(user, title, course, briefDescription, body) {
   try {
     const docRef = await addDoc(collection(firestore, "posts"), {
       title: title,
       course: course,
-      userEmail: email,
+      user: user,
       briefDescription: briefDescription,
       body: body,
       dateCreated: Timestamp.now(),
@@ -135,10 +135,10 @@ export async function newPost(email, title, course, briefDescription, body) {
   }
 }
 
-export async function newComment(email, body) {
+export async function newComment(user, body) {
   try {
     const docRef = await addDoc(collection(firestore, "comments"), {
-      userEmail: email,
+      user: user,
       body: body,
       dateCreated: Timestamp.now(),
       likeCount: 0,
@@ -162,6 +162,21 @@ export async function getComment(id) {
   } catch (e) {
     console.error(e);
   }
+}
+
+export function getDate(date) {
+  const yyyy = date.getFullYear();
+  let mm = date.getMonth() + 1;
+  let dd = date.getDate();
+  let hour = date.getHours();
+  let minute = date.getMinutes();
+
+  if (dd < 10) dd = "0" + dd;
+  if (mm < 10) mm = "0" + mm;
+  if (hour < 10) hour = "0" + hour;
+  if (minute < 10) minute = "0" + minute;
+
+  return `  ${dd}/${mm}/${yyyy} ${hour}:${minute}`;
 }
 
 export default app;

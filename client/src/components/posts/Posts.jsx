@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./posts.css";
-import { getPosts } from "../../firebase";
+import { getPosts, getDate } from "../../firebase";
 import { DocumentSnapshot, toDate } from "firebase/firestore";
 
 export function PostList(props) {
@@ -20,9 +20,9 @@ export function PostList(props) {
                 />
               </a>
               <div className="media-body ml-3">
-                <a className="text-secondary">{props.userEmail}</a>
+                <a className="text-secondary">{props.user}</a>
                 <small className="text-muted ml-2">{props.dateCreated}</small>
-                <Link to={"/dashboard/postpage/" + props.id}>
+                <Link className="title" to={"/dashboard/postpage/" + props.id}>
                   <h5 className="mt-1">{props.title}</h5>
                 </Link>
                 <div className="mt-3 font-size-sm">
@@ -48,15 +48,17 @@ export function PostList(props) {
 export default function Posts() {
   const [snapshot, setSnapshot] = useState();
   const [postsData, setPostsdata] = useState([]);
+
   useEffect(() => {
     const testFunction = async () => {
       const snapshot = await getPosts();
       setSnapshot(snapshot);
       snapshot.forEach((doc) => {
+        const date = getDate(doc.data().dateCreated.toDate());
         let props = {
           id: doc.data().id,
-          userEmail: doc.data().userEmail,
-          dateCreated: doc.data().dateCreated.toDate().toString(),
+          user: doc.data().user,
+          dateCreated: date,
           title: doc.data().title,
           briefDescription: doc.data().briefDescription,
           viewCount: doc.data().viewCount,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./comments.css";
-import { getComment } from "../../firebase";
+import { getComment, getDate } from "../../firebase";
 import { DocumentSnapshot, toDate } from "firebase/firestore";
 
 export function CommentsList(props) {
@@ -20,7 +20,7 @@ export function CommentsList(props) {
                 />
               </a>
               <div className="media-body ml-3">
-                <a className="text-secondary">{props.userEmail}</a>
+                <a className="text-secondary">{props.user}</a>
                 <small className="text-muted ml-2">{props.dateCreated}</small>
 
                 <div className="mt-3 font-size-sm">{props.body}</div>
@@ -47,8 +47,8 @@ export default function Comments(props) {
           const doc = await getComment(docId);
           console.log(doc);
           let props = {
-            userEmail: doc.userEmail,
-            dateCreated: doc.dateCreated.toDate().toString(),
+            user: doc.user,
+            dateCreated: getDate(doc.dateCreated.toDate()),
             body: doc.body,
             likeCount: doc.likeCount,
           };

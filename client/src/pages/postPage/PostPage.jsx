@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./postPage.css";
-import { getRawPost, getPost, getUserEmail, newComment } from "../../firebase";
+import {
+  getRawPost,
+  getPost,
+  getUserEmail,
+  newComment,
+  getUserInfo,
+  getDate,
+} from "../../firebase";
 import { updateDoc } from "firebase/firestore";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -16,21 +23,22 @@ export default function PostPage() {
   const handleClose = () => setShowmodal(false);
   const handleShow = () => setShowmodal(true);
   const [thisPost, setThisPost] = useState();
-  const [userEmail, setUserEmail] = useState("email loading");
+  const [user, setUser] = useState("email loading");
   const [title, setTitle] = useState("title loading");
   const [time, setTime] = useState("time loading");
   const [discbody, setDiscbody] = useState("disc loading");
   const [comments, setComments] = useState([]);
   const [likeCount, setLikeCount] = useState();
   const [viewCount, setViewCount] = useState();
+
   useEffect(() => {
     const tempFunc = async () => {
       const thisPost = await getPost(params.id);
       setThisPost(thisPost);
-      setUserEmail(thisPost.userEmail);
+      setUser(thisPost.user);
       setTitle(thisPost.title);
       setDiscbody(thisPost.body);
-      setTime(thisPost.dateCreated.toDate().toString());
+      setTime(getDate(thisPost.dateCreated.toDate()));
       setLikeCount(thisPost.likeCount);
       setViewCount(thisPost.viewCount);
       setComments(thisPost.comments);
@@ -40,7 +48,8 @@ export default function PostPage() {
 
   async function createComment() {
     const userEmail = await getUserEmail();
-    const commentId = await newComment(userEmail, commentbody);
+    const userInfo = await getUserInfo(userEmail);
+    const commentId = await newComment(userInfo.displayName, commentbody);
     const docRef = await getRawPost(params.id);
 
     await updateDoc(docRef, { comments: [...comments, commentId] });
@@ -62,7 +71,7 @@ export default function PostPage() {
                 />
               </a>
               <div className="media-body ml-3">
-                <a className="text-secondary">{userEmail}</a>
+                <a className="text-secondary">{user}</a>
                 <small className="text-muted ml-2">{time}</small>
                 <h5 className="mt-1">{title}</h5>
                 <div className="mt-3 font-size-sm">{discbody}</div>

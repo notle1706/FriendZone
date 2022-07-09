@@ -7,7 +7,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { newPost, getUserEmail } from "../../firebase";
+import { newPost, getUserEmail, getUserInfo } from "../../firebase";
 
 function Discussions() {
   const [showmodal, setShowmodal] = useState(false);
@@ -20,8 +20,9 @@ function Discussions() {
 
   async function createPost() {
     const userEmail = await getUserEmail();
+    const userInfo = await getUserInfo(userEmail);
 
-    await newPost(userEmail, title, course, desc, discbody);
+    await newPost(userInfo.displayName, title, course, desc, discbody);
   }
 
   return (
