@@ -84,7 +84,7 @@ export default function PostPage() {
                   <i className="far fa-comment ml-2"></i> {0}
                 </span>
                 <Button variant="link" onClick={handleShow}>
-                  Reply
+                  Add comment
                 </Button>
               </div>
             </div>

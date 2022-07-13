@@ -13,12 +13,14 @@ import { auth, getUserInfo, firestore, getUserEmail } from "../../firebase";
 function Profile() {
   const [userInfo, setUserInfo] = useState("info placeholder");
   const [userEmail, setUserEmail] = useState();
+  const [postNo, setPostno] = useState();
   useEffect(() => {
     const getData = async () => {
       const newUserEmail = await getUserEmail();
       const userInfo = await getUserInfo(newUserEmail);
       setUserEmail(newUserEmail);
       setUserInfo(userInfo);
+      setPostno(userInfo.posts.length);
     };
     getData();
   }, []);
@@ -59,7 +61,7 @@ function Profile() {
                 <div className="mt-5 text-center">
                   <h4 className="mb-0">{userInfo.displayName}</h4>
                   <span className="text-muted d-block mb-2">
-                    Barely hanging on
+                    {userInfo.teleHandle}
                   </span>
 
                   <button className="btn btn-primary btn-sm follow">
@@ -75,7 +77,7 @@ function Profile() {
                   <div className="d-flex justify-content-between align-items-center mt-4 px-4">
                     <div className="stats">
                       <h6 className="mb-0">Posts</h6>
-                      <span>2</span>
+                      <span>{postNo}</span>
                     </div>
 
                     <div className="stats">

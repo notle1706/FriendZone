@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "./dropdown.css";
 import axios from "axios";
 import Select from "react-select";
-import BootstrapSelect from "react-bootstrap-select-dropdown";
 
-export default function Test() {
+export default function Dropdown(props) {
   const url = "https://api.nusmods.com/v2/2021-2022/moduleList.json";
   const [openMenu, setOpenMenu] = useState(false);
   const [modsData, setModsData] = useState();
@@ -46,8 +45,12 @@ export default function Test() {
       <Select
         options={modsData}
         menuIsOpen={openMenu}
+        placeholder={"Add a module here!"}
         onInputChange={handleInputChange}
-        onChange={hideMenu}
+        onChange={(event) => {
+          hideMenu();
+          props.onchange(event);
+        }}
         onBlur={hideMenu}
       />
     </>
