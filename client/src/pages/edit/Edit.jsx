@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./edit.css";
 import { auth, setUserInfo, getUserEmail, getUserInfo } from "../../firebase";
+import Select from "react-select";
+import { getModsData } from "../../packageHandler";
+import Dropdown from "../../components/dropdown/Dropdown";
+import Button from "react-bootstrap/Button";
+import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
 export default function Edit() {
   const [user, setUser] = useState("info placeholder");
@@ -21,14 +26,36 @@ export default function Edit() {
       setUser(user);
     };
     getData();
-  }, []);
-  const [dname, setDname] = useState(null);
-  const [fname, setFname] = useState(null);
-  const [lname, setLname] = useState(null);
-  const [course, setCourse] = useState(null);
-  const [year, setYear] = useState(null);
-  const [teleHandle, setTeleHandle] = useState(null);
-  const [bday, setBday] = useState(null);
+  }, [user]);
+
+  if (!user) {
+    return <>Loading!</>;
+  }
+
+  const [modsData, setModsData] = useState();
+  const [dname, setDname] = useState();
+  const [fname, setFname] = useState();
+  const [lname, setLname] = useState();
+  const [course, setCourse] = useState();
+  const [mods, setMods] = useState(["loading"]);
+  const [year, setYear] = useState();
+  const [teleHandle, setTeleHandle] = useState();
+  const [bday, setBday] = useState();
+  const [displayMods, setDisplayMods] = useState();
+
+  useEffect(() => {
+    setMods(user.modulesTaken);
+  }, [user]);
+
+  useEffect(() => {
+    if (mods) {
+      setDisplayMods(
+        mods.map((mod) => {
+          return <Button>{mod}</Button>;
+        })
+      );
+    }
+  }, [mods]);
 
   async function submitChanges() {
     await setUserInfo(userEmail, "displayName", dname);
@@ -38,7 +65,31 @@ export default function Edit() {
     await setUserInfo(userEmail, "year", year);
     await setUserInfo(userEmail, "teleHandle", teleHandle);
     await setUserInfo(userEmail, "birthday", bday);
+    await setUserInfo(userEmail, "modulesTaken", mods);
   }
+
+  useEffect(
+    () =>
+      (async () => {
+        const fullData = await getModsData();
+        const modsData = fullData.map((course) => {
+          var info = {
+            value: course.moduleCode,
+            label: `${course.moduleCode}: ${course.title} `,
+          };
+          return info;
+        });
+        setModsData(modsData);
+      })(),
+    []
+  );
+  if (!modsData) {
+    return <>Loading!</>;
+  }
+
+  const handleChange = (event) => {
+    setMods([...mods, event.value]);
+  };
 
   return (
     <>
@@ -170,13 +221,10 @@ export default function Edit() {
                     <label class="small mb-1" for="inputModules">
                       Modules taken
                     </label>
-                    <input
-                      class="form-control"
-                      id="inputModules"
-                      type="text"
-                      placeholder="Enter your Modules"
-                      defaultValue="CS9999"
-                    />
+                    <div className="ml-1">
+                      <Dropdown onchange={handleChange} />
+                    </div>
+                    <div>{displayMods}</div>
                   </div>
                   {/* Form Group (email address)*/}
                   <div class="mb-3">

@@ -35,6 +35,7 @@ export async function addUser(displayName, email) {
     const docRef = await setDoc(doc(firestore, "users", email), {
       displayName: displayName,
       email: email,
+      posts: [],
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
@@ -130,6 +131,7 @@ export async function newPost(user, title, course, briefDescription, body) {
     await updateDoc(docRef, {
       id: docRef.id,
     });
+    return docRef.id;
   } catch (e) {
     console.error("Error adding document: ", e);
   }
