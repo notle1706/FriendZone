@@ -43,13 +43,14 @@ export default function Test() {
 
   return (
     <>
-      <Select
-        options={modsData}
-        menuIsOpen={openMenu}
-        onInputChange={handleInputChange}
-        onChange={hideMenu}
-        onBlur={hideMenu}
-      />
+      <div className="btn-group">
+        <button type="button" className="btn btn-outline-secondary">
+          Action
+        </button>
+        <button type="button" className="btn btn-outline-secondary">
+          x
+        </button>
+      </div>
     </>
   );
 }

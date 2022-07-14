@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./discussions.css";
+import Dropdown from "../../components/dropdown/Dropdown";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Posts from "../../components/posts/Posts";
 import Modal from "react-bootstrap/Modal";
@@ -7,21 +8,38 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import Alert from "react-bootstrap/Alert";
+import { Link } from "react-router-dom";
 import {
   newPost,
   getUserEmail,
   getUserInfo,
   setUserInfo,
 } from "../../firebase";
+import Nav from "react-bootstrap/Nav";
+import { SignalWifiStatusbarNullSharp } from "@mui/icons-material";
 
 function Discussions() {
+  const [errormsg, setErrormsg] = useState(false);
+  const [pageContents, setPageContents] = useState("All posts");
   const [showmodal, setShowmodal] = useState(false);
   const handleClose = () => setShowmodal(false);
   const handleShow = () => setShowmodal(true);
   const [title, setTitle] = useState();
-  const [course, setCourse] = useState();
+  const [mod, setMod] = useState();
   const [desc, setDesc] = useState();
   const [discbody, setDiscbody] = useState();
+  const [searchmod, setSearchMod] = useState();
+
+  const handleChange = (event) => {
+    setPageContents(event.value);
+  };
+
+  const handleSetMod = (event) => {
+    setMod(event.value);
+  };
+
+  useEffect(() => console.log(pageContents), [pageContents]);
 
   async function createPost() {
     const userEmail = await getUserEmail();
@@ -30,12 +48,17 @@ function Discussions() {
     const newpost = await newPost(
       userInfo.displayName,
       title,
-      course,
+      mod,
       desc,
       discbody
     );
     const postAppend = [...userInfo.posts, newpost];
     setUserInfo(userEmail, "posts", postAppend);
+  }
+  function contentsEmpty() {
+    if (!title || !mod || !desc || !discbody) {
+      return true;
+    } else return false;
   }
 
   return (
@@ -79,7 +102,26 @@ function Discussions() {
               {/* /Inner sidebar header */}
 
               {/* Inner sidebar body */}
-
+              <Nav variant="pills" defaultActiveKey="#" className="flex-column">
+                <Nav.Link
+                  eventKey="all-posts"
+                  onClick={() => setPageContents("All posts")}
+                >
+                  All posts
+                </Nav.Link>
+                <Nav.Link
+                  onClick={() => setPageContents("Search by mods")}
+                  eventKey="search-by-mod"
+                >
+                  Search by Mods
+                </Nav.Link>
+                <Nav.Link eventKey="future-link" disabled>
+                  Other Discussions
+                </Nav.Link>
+                <Nav.Link eventKey="future-link" disabled>
+                  Future feature
+                </Nav.Link>
+              </Nav>
               {/* /Inner sidebar body */}
             </div>
             {/* /Inner sidebar */}
@@ -115,120 +157,22 @@ function Discussions() {
               {/* Inner main body */}
 
               {/* Forum List */}
-              <div className="inner-main-body p-2 p-sm-3 collapse forum-content show">
-                <Posts />
-                <ul className="pagination pagination-sm pagination-circle justify-content-center mb-0">
-                  <li className="page-item disabled">
-                    <span className="page-link has-icon">
-                      <i className="material-icons">chevron_left</i>
-                    </span>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link">1</a>
-                  </li>
-                  <li className="page-item active">
-                    <span className="page-link">2</span>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link">3</a>
-                  </li>
-                  <li className="page-item">
-                    <a className="page-link has-icon">
-                      <i className="material-icons">chevron_right</i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              {/* /Forum List */}
+              {pageContents === "All posts" ? (
+                <div className="p-1 p-sm-3 collapse forum-content show overflow-auto">
+                  <Posts />
+                </div>
+              ) : pageContents === "Search by mods" ? (
+                <div className="p-1 p-sm-3 collapse forum-content show">
+                  <Dropdown
+                    onchange={handleChange}
+                    placeholder="Search for your module here!"
+                  />
+                </div>
+              ) : (
+                <Posts mod={pageContents} />
+              )}
 
-              {/* Forum Detail */}
-              <div
-                className="inner-main-body p-2 p-sm-3 collapse forum-content"
-                id="collapseExample"
-              >
-                <a
-                  href="#"
-                  className="btn btn-light btn-sm mb-3 has-icon"
-                  data-toggle="collapse"
-                  data-target=".forum-content"
-                >
-                  <i className="fa fa-arrow-left mr-2"></i>Back
-                </a>
-                <div className="post mb-2">
-                  <div className="post-body">
-                    <div className="media forum-item">
-                      <a className="post-link">
-                        <img
-                          src="https://bootdey.com/img/Content/avatar/avatar1.png"
-                          className="rounded-circle"
-                          width="50"
-                          alt="User"
-                        />
-                        <small className="d-block text-center text-muted">
-                          Newbie
-                        </small>
-                      </a>
-                      <div className="media-body ml-3">
-                        <a className="text-secondary">Mokrani</a>
-                        <small className="text-muted ml-2">1 hour ago</small>
-                        <h5 className="mt-1">Realtime fetching data</h5>
-                        <div className="mt-3 font-size-sm">
-                          <p>Hellooo :)</p>
-                          <p>
-                            I'm newbie with laravel and i want to fetch data
-                            from database in realtime for my dashboard anaytics
-                            and i found a solution with ajax but it dosen't work
-                            if any one have a simple solution it will be helpful
-                          </p>
-                          <p>Thank</p>
-                        </div>
-                      </div>
-                      <div className="text-muted small text-center">
-                        <span className="d-none d-sm-inline-block">
-                          <i className="far fa-eye"></i> 19
-                        </span>
-                        <span>
-                          <i className="far fa-comment ml-2"></i> 3
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="post mb-2">
-                  <div className="post-body">
-                    <div className="media forum-item">
-                      <a className="post-link">
-                        <img
-                          src="https://bootdey.com/img/Content/avatar/avatar2.png"
-                          className="rounded-circle"
-                          width="50"
-                          alt="User"
-                        />
-                        <small className="d-block text-center text-muted">
-                          Pro
-                        </small>
-                      </a>
-                      <div className="media-body ml-3">
-                        <a className="text-secondary">drewdan</a>
-                        <small className="text-muted ml-2">1 hour ago</small>
-                        <div className="mt-3 font-size-sm">
-                          <p>What exactly doesn't work with your ajax calls?</p>
-                          <p>
-                            Also, WebSockets are a great solution for realtime
-                            data on a dashboard. Laravel offers this out of the
-                            box using broadcasting
-                          </p>
-                        </div>
-                        <button className="btn btn-xs text-muted has-icon">
-                          <i className="fa fa-heart" aria-hidden="true"></i>1
-                        </button>
-                        <a className="text-muted small">Reply</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* /Forum Detail */}
+              {/* /Forum List */}
 
               {/* /Inner main body */}
             </div>
@@ -236,6 +180,7 @@ function Discussions() {
           </div>
 
           {/* New Thread Modal */}
+
           <Modal
             size="lg"
             show={showmodal}
@@ -259,14 +204,8 @@ function Discussions() {
                     </Form.Group>
                   </Col>
                   <Col md>
-                    <Form.Group
-                      onChange={(event) => setCourse(event.target.value)}
-                      className="mb-3"
-                      controlId="discussionArea"
-                    >
-                      <Form.Label>Course</Form.Label>
-                      <Form.Control />
-                    </Form.Group>
+                    <Form.Label>Modules</Form.Label>
+                    <Dropdown onchange={handleSetMod} />
                   </Col>
                 </Row>
                 <Form.Group
@@ -293,12 +232,21 @@ function Discussions() {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    createPost();
-                    handleClose();
+                    if (contentsEmpty()) {
+                      setErrormsg(true);
+                    } else {
+                      createPost();
+                      handleClose();
+                    }
                   }}
                 >
                   Save Changes
                 </Button>
+                <div>
+                  <p className="text-danger">
+                    {errormsg ? "Please make sure all fields are filled" : null}
+                  </p>
+                </div>
               </Modal.Footer>
             </Form>
           </Modal>

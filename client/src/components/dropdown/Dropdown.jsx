@@ -45,7 +45,7 @@ export default function Dropdown(props) {
       <Select
         options={modsData}
         menuIsOpen={openMenu}
-        placeholder={"Add a module here!"}
+        placeholder={props.placeholder}
         onInputChange={handleInputChange}
         onChange={(event) => {
           hideMenu();

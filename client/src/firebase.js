@@ -12,7 +12,17 @@ import {
   updateDoc,
   getDocs,
   Timestamp,
+  query,
+  orderBy,
+  where,
 } from "firebase/firestore";
+import {
+  ref,
+  getStorage,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+
 import { React, useEffect, useState, useContext, createContext } from "react";
 
 const firebaseConfig = {
@@ -29,6 +39,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
+
+export const storage = getStorage();
 
 export async function addUser(displayName, email) {
   try {
@@ -89,9 +101,18 @@ export async function setUserInfo(user, info, newInfo) {
   }
 }
 
-export async function getPosts() {
-  const snapshot = await getDocs(collection(firestore, "posts"));
-  return snapshot;
+export async function getPosts(order, dir) {
+  const postsRef = collection(firestore, "posts");
+  const q = query(postsRef, orderBy(order, dir));
+  const snapShot = await getDocs(q);
+  return snapShot;
+}
+
+export async function getPostsByMod(mod, order, dir) {
+  const postsRef = collection(firestore, "posts");
+  const q = query(postsRef, orderBy(order, dir), where("mod", "==", mod));
+  const snapShot = await getDocs(q);
+  return snapShot;
 }
 
 export async function getPost(postId) {
@@ -114,11 +135,11 @@ export async function getRawPost(postId) {
   }
 }
 
-export async function newPost(user, title, course, briefDescription, body) {
+export async function newPost(user, title, mod, briefDescription, body) {
   try {
     const docRef = await addDoc(collection(firestore, "posts"), {
       title: title,
-      course: course,
+      mod: mod,
       user: user,
       briefDescription: briefDescription,
       body: body,
@@ -179,6 +200,14 @@ export function getDate(date) {
   if (minute < 10) minute = "0" + minute;
 
   return `  ${dd}/${mm}/${yyyy} ${hour}:${minute}`;
+}
+
+export async function uploadFiles(file) {
+  if (!file) return;
+  const storageRef = ref(storage, `/files/${file.name}`);
+  const uploadTask = await uploadBytesResumable(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+  return url;
 }
 
 export default app;

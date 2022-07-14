@@ -14,6 +14,9 @@ function Profile() {
   const [userInfo, setUserInfo] = useState("info placeholder");
   const [userEmail, setUserEmail] = useState();
   const [postNo, setPostno] = useState();
+  const [mods, setMods] = useState();
+  const [displayMods, setDisplayMods] = useState();
+  const [picurl, setPicUrl] = useState();
   useEffect(() => {
     const getData = async () => {
       const newUserEmail = await getUserEmail();
@@ -21,9 +24,29 @@ function Profile() {
       setUserEmail(newUserEmail);
       setUserInfo(userInfo);
       setPostno(userInfo.posts.length);
+      setMods(userInfo.modulesTaken);
+      setPicUrl(userInfo.profilePicture);
     };
     getData();
+    return () => console.log("get user data cleanup");
   }, []);
+
+  useEffect(() => {
+    if (mods) {
+      setDisplayMods(
+        mods.map((mod) => {
+          return (
+            <span>
+              <button type="button" className="mb-1 btn btn-outline-secondary">
+                {mod}
+              </button>
+            </span>
+          );
+        })
+      );
+    }
+    return () => console.log("cleanup render mod buttons");
+  }, [mods]);
 
   let navigate = useNavigate();
 
@@ -34,6 +57,7 @@ function Profile() {
           <div className="col">
             <div className="card module-card">
               <h3 className="module-text">My Modules</h3>
+              <div>{displayMods}</div>
               <div className="container"></div>
             </div>
           </div>
@@ -50,11 +74,7 @@ function Profile() {
 
                 <div className="user text-center">
                   <div className="profile">
-                    <img
-                      src="https://i.imgur.com/JgYD2nQ.jpg"
-                      className="rounded-circle"
-                      width="80"
-                    />
+                    <img src={picurl} className="rounded-circle" width="80" />
                   </div>
                 </div>
 

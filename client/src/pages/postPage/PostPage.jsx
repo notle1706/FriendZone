@@ -30,6 +30,7 @@ export default function PostPage() {
   const [comments, setComments] = useState([]);
   const [likeCount, setLikeCount] = useState();
   const [viewCount, setViewCount] = useState();
+  const [mod, setMod] = useState();
 
   useEffect(() => {
     const tempFunc = async () => {
@@ -42,6 +43,7 @@ export default function PostPage() {
       setLikeCount(thisPost.likeCount);
       setViewCount(thisPost.viewCount);
       setComments(thisPost.comments);
+      setMod(thisPost.mod);
     };
     tempFunc();
   }, []);
@@ -70,6 +72,7 @@ export default function PostPage() {
                   alt="User"
                 />
               </a>
+              <span>{mod}</span>
               <div className="media-body ml-3">
                 <a className="text-secondary">{user}</a>
                 <small className="text-muted ml-2">{time}</small>
