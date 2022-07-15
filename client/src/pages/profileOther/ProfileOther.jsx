@@ -1,15 +1,16 @@
-import "./profile.css";
+import "./profileother.css";
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getUserInfo, getUserEmail } from "../../firebase";
 import Posts from "../../components/posts/Posts";
+import Button from "react-bootstrap/Button";
 
 function ProfileData(props) {
   return (
     <>
       <div className="col d-flex justify-content-center">
         <div className="card">
-          <h3 className="module-text">My Modules</h3>
+          <h3 className="module-text">Modules</h3>
           <div>{props.displayMods}</div>
         </div>
       </div>
@@ -36,7 +37,9 @@ function MyComments() {
   );
 }
 
-function Profile() {
+function ProfileOther() {
+  const params = useParams();
+  const [ownUserEmail, setOwnUserEmail] = useState();
   const [userInfo, setUserInfo] = useState("info placeholder");
   const [userEmail, setUserEmail] = useState();
   const [postNo, setPostno] = useState();
@@ -48,8 +51,10 @@ function Profile() {
   const [userPosts, setUserPosts] = useState();
   useEffect(() => {
     const getData = async () => {
-      const newUserEmail = await getUserEmail();
+      const newUserEmail = params.id;
       const userInfo = await getUserInfo(newUserEmail);
+      const ownEmail = await getUserEmail();
+      setOwnUserEmail(ownEmail);
       setUserEmail(newUserEmail);
       setUserInfo(userInfo);
       setPostno(userInfo.posts.length);
@@ -93,7 +98,7 @@ function Profile() {
               }
               onClick={() => setProfilePage("profile")}
             >
-              My Profile
+              Profile
             </a>
           </li>
           <li className="nav-item">
@@ -104,7 +109,7 @@ function Profile() {
               }
               onClick={() => setProfilePage("posts")}
             >
-              My posts
+              Posts
             </a>
           </li>
           <li className="nav-item">
@@ -115,7 +120,7 @@ function Profile() {
               }
               onClick={() => setProfilePage("comments")}
             >
-              My comments
+              Comments
             </a>
           </li>
         </ul>
@@ -152,16 +157,6 @@ function Profile() {
                   {userInfo.teleHandle}
                 </span>
 
-                <button className="btn btn-primary btn-sm follow">
-                  <Link
-                    className="text-light"
-                    style={{ textDecoration: "none" }}
-                    to="/dashboard/edit"
-                  >
-                    Edit profile
-                  </Link>
-                </button>
-
                 <div className="d-flex justify-content-between align-items-center mt-4 px-4">
                   <div className="stats">
                     <h6 className="mb-0">Posts</h6>
@@ -178,6 +173,11 @@ function Profile() {
                     <span>129</span>
                   </div>
                 </div>
+                <div>
+                  {ownUserEmail != userEmail ? (
+                    <Button>Add friend</Button>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
@@ -187,4 +187,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default ProfileOther;

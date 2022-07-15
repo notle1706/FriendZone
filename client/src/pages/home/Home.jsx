@@ -1,11 +1,8 @@
 import React, { useState, Fragment } from "react";
 import "./home.css";
-import { Menu, Transition } from '@headlessui/react'
-import { DotsVerticalIcon } from '@heroicons/react/outline'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'
-import Topbar from "../../components/topbar/Topbar";
-import Sidebar from "../../components/sidebar/Sidebar";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Menu, Transition } from "@headlessui/react";
+import { DotsVerticalIcon } from "@heroicons/react/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
 import {
   add,
   eachDayOfInterval,
@@ -19,49 +16,45 @@ import {
   parse,
   parseISO,
   startOfToday,
-} from 'date-fns'
-
+} from "date-fns";
 
 const modules = [
   {
     id: 1,
-    name: 'CS2100',
-    startDatetime: '2022-07-11T14:00',
-    endDatetime: '2022-07-11T15:30',
+    name: "CS2100",
+    startDatetime: "2022-07-11T14:00",
+    endDatetime: "2022-07-11T15:30",
   },
-
-]
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
-
 function Home() {
-
-  let today = startOfToday()
-  let [selectedDay, setSelectedDay] = useState(today)
-  let [currentMonth, setCurrentMonth] = useState(format(today, 'MMM-yyyy'))
-  let firstDayCurrentMonth = parse(currentMonth, 'MMM-yyyy', new Date())
+  let today = startOfToday();
+  let [selectedDay, setSelectedDay] = useState(today);
+  let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
+  let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
 
   let days = eachDayOfInterval({
     start: firstDayCurrentMonth,
     end: endOfMonth(firstDayCurrentMonth),
-  })
+  });
 
   function previousMonth() {
-    let firstDayNextMonth = add(firstDayCurrentMonth, { months: -1 })
-    setCurrentMonth(format(firstDayNextMonth, 'MMM-yyyy'))
+    let firstDayNextMonth = add(firstDayCurrentMonth, { months: -1 });
+    setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
   function nextMonth() {
-    let firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 })
-    setCurrentMonth(format(firstDayNextMonth, 'MMM-yyyy'))
+    let firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
+    setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
   let selectedDayModules = modules.filter((module) =>
     isSameDay(parseISO(module.startDatetime), selectedDay)
-  )
+  );
   return (
     <div className="container">
       <div className="row">
@@ -78,7 +71,7 @@ function Home() {
           <div className="calendar">
             <div className="flex items-center">
               <h2 className="flex-auto font-semibold text-gray-900">
-                {format(firstDayCurrentMonth, 'MMMM yyyy')}
+                {format(firstDayCurrentMonth, "MMMM yyyy")}
               </h2>
               <button
                 type="button"
@@ -112,37 +105,37 @@ function Home() {
                   key={day.toString()}
                   className={classNames(
                     dayIdx === 0 && colStartClasses[getDay(day)],
-                    'py-1.5'
+                    "py-1.5"
                   )}
                 >
                   <button
                     type="button"
                     onClick={() => setSelectedDay(day)}
                     className={classNames(
-                      isEqual(day, selectedDay) && 'text-white',
+                      isEqual(day, selectedDay) && "text-white",
                       !isEqual(day, selectedDay) &&
-                      isToday(day) &&
-                      'text-red-500',
+                        isToday(day) &&
+                        "text-red-500",
                       !isEqual(day, selectedDay) &&
-                      !isToday(day) &&
-                      isSameMonth(day, firstDayCurrentMonth) &&
-                      'text-gray-900',
+                        !isToday(day) &&
+                        isSameMonth(day, firstDayCurrentMonth) &&
+                        "text-gray-900",
                       !isEqual(day, selectedDay) &&
-                      !isToday(day) &&
-                      !isSameMonth(day, firstDayCurrentMonth) &&
-                      'text-gray-400',
-                      isEqual(day, selectedDay) && isToday(day) && 'bg-red-500',
+                        !isToday(day) &&
+                        !isSameMonth(day, firstDayCurrentMonth) &&
+                        "text-gray-400",
+                      isEqual(day, selectedDay) && isToday(day) && "bg-red-500",
                       isEqual(day, selectedDay) &&
-                      !isToday(day) &&
-                      'bg-gray-900',
-                      !isEqual(day, selectedDay) && 'hover:bg-gray-200',
+                        !isToday(day) &&
+                        "bg-gray-900",
+                      !isEqual(day, selectedDay) && "hover:bg-gray-200",
                       (isEqual(day, selectedDay) || isToday(day)) &&
-                      'font-semibold',
-                      'mx-auto flex h-8 w-8 items-center justify-center rounded-full'
+                        "font-semibold",
+                      "mx-auto flex h-8 w-8 items-center justify-center rounded-full"
                     )}
                   >
-                    <time dateTime={format(day, 'yyyy-MM-dd')}>
-                      {format(day, 'd')}
+                    <time dateTime={format(day, "yyyy-MM-dd")}>
+                      {format(day, "d")}
                     </time>
                   </button>
 
@@ -150,8 +143,8 @@ function Home() {
                     {modules.some((module) =>
                       isSameDay(parseISO(module.startDatetime), day)
                     ) && (
-                        <div className="w-1 h-1 rounded-full bg-sky-500"></div>
-                      )}
+                      <div className="w-1 h-1 rounded-full bg-sky-500"></div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -159,9 +152,9 @@ function Home() {
           </div>
           <section className="mt-12 md:mt-0 md:pl-14">
             <h2 className="font-semibold text-gray-900">
-              Schedule for{' '}
-              <time dateTime={format(selectedDay, 'yyyy-MM-dd')}>
-                {format(selectedDay, 'MMM dd, yyy')}
+              Schedule for{" "}
+              <time dateTime={format(selectedDay, "yyyy-MM-dd")}>
+                {format(selectedDay, "MMM dd, yyy")}
               </time>
             </h2>
             <ol className="mt-4 space-y-1 text-sm leading-6 text-gray-500">
@@ -177,15 +170,12 @@ function Home() {
         </div>
       </div>
     </div>
-
-  )
-
-
+  );
 }
 
 function module({ module }) {
-  let startDateTime = parseISO(module.startDatetime)
-  let endDateTime = parseISO(module.endDatetime)
+  let startDateTime = parseISO(module.startDatetime);
+  let endDateTime = parseISO(module.endDatetime);
 
   return (
     <li className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100">
@@ -198,11 +188,11 @@ function module({ module }) {
         <p className="text-gray-900">{module.name}</p>
         <p className="mt-0.5">
           <time dateTime={module.startDatetime}>
-            {format(startDateTime, 'h:mm a')}
-          </time>{' '}
-          -{' '}
+            {format(startDateTime, "h:mm a")}
+          </time>{" "}
+          -{" "}
           <time dateTime={module.endDatetime}>
-            {format(endDateTime, 'h:mm a')}
+            {format(endDateTime, "h:mm a")}
           </time>
         </p>
       </div>
@@ -233,8 +223,8 @@ function module({ module }) {
                   <a
                     href="#"
                     className={classNames(
-                      active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                      'block px-4 py-2 text-sm'
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
                     )}
                   >
                     Edit
@@ -246,8 +236,8 @@ function module({ module }) {
                   <a
                     href="#"
                     className={classNames(
-                      active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                      'block px-4 py-2 text-sm'
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
                     )}
                   >
                     Cancel
@@ -259,17 +249,17 @@ function module({ module }) {
         </Transition>
       </Menu>
     </li>
-  )
+  );
 }
 
 let colStartClasses = [
-  '',
-  'col-start-2',
-  'col-start-3',
-  'col-start-4',
-  'col-start-5',
-  'col-start-6',
-  'col-start-7',
-]
+  "",
+  "col-start-2",
+  "col-start-3",
+  "col-start-4",
+  "col-start-5",
+  "col-start-6",
+  "col-start-7",
+];
 
 export default Home;

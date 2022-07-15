@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./posts.css";
-import { getPosts, getDate, getPostsByMod } from "../../firebase";
-import { DocumentSnapshot, toDate } from "firebase/firestore";
+import {
+  getPosts,
+  getDate,
+  getPostsByMod,
+  getPostsFromUser,
+} from "../../firebase";
 
 export function PostList(props) {
   return (
@@ -35,7 +39,7 @@ export function PostList(props) {
                   <i className="far fa-eye"></i> {props.viewCount}
                 </span>
                 <span>
-                  <i className="far fa-comment ml-2"></i> {props.likeCount}
+                  <i className="far fa-comment ml-2"></i> {props.commentNo}
                 </span>
               </div>
             </div>
@@ -47,59 +51,102 @@ export function PostList(props) {
 }
 
 export default function Posts(props) {
-  if (props.mod == null) {
-    const [snapshot, setSnapshot] = useState();
-    const [postsData, setPostsdata] = useState([]);
+  switch (true) {
+    case props.mod != null:
+      {
+        const [snapshot, setSnapshot] = useState();
+        const [postsData, setPostsdata] = useState([]);
 
-    useEffect(() => {
-      const testFunction = async () => {
-        const snapshot = await getPosts("dateCreated", "desc");
-        setSnapshot(snapshot);
-        snapshot.forEach((doc) => {
-          const date = getDate(doc.data().dateCreated.toDate());
-          let props = {
-            id: doc.data().id,
-            user: doc.data().user,
-            dateCreated: date,
-            title: doc.data().title,
-            briefDescription: doc.data().briefDescription,
-            viewCount: doc.data().viewCount,
-            likeCount: doc.data().likeCount,
-            mod: doc.data().mod,
+        useEffect(() => {
+          const testFunction = async () => {
+            const snapshot = await getPostsByMod(
+              props.mod,
+              "dateCreated",
+              "desc"
+            );
+            setSnapshot(snapshot);
+            snapshot.forEach((doc) => {
+              const date = getDate(doc.data().dateCreated.toDate());
+              let props = {
+                id: doc.data().id,
+                user: doc.data().user,
+                dateCreated: date,
+                title: doc.data().title,
+                briefDescription: doc.data().briefDescription,
+                viewCount: doc.data().viewCount,
+                likeCount: doc.data().likeCount,
+                mod: doc.data().mod,
+              };
+              setPostsdata((arr) => [...arr, <PostList {...props} />]);
+            });
           };
-          setPostsdata((arr) => [...arr, <PostList {...props} />]);
-        });
-      };
-      testFunction();
-    }, []);
+          testFunction();
+        }, []);
 
-    return <>{postsData.map((post) => post)}</>;
-  } else {
-    const [snapshot, setSnapshot] = useState();
-    const [postsData, setPostsdata] = useState([]);
+        return <>{postsData.map((post) => post)}</>;
+      }
+      break;
+    case props.userPosts != null:
+      {
+        const [snapshot, setSnapshot] = useState();
+        const [postsData, setPostsdata] = useState([]);
 
-    useEffect(() => {
-      const testFunction = async () => {
-        const snapshot = await getPostsByMod(props.mod, "dateCreated", "desc");
-        setSnapshot(snapshot);
-        snapshot.forEach((doc) => {
-          const date = getDate(doc.data().dateCreated.toDate());
-          let props = {
-            id: doc.data().id,
-            user: doc.data().user,
-            dateCreated: date,
-            title: doc.data().title,
-            briefDescription: doc.data().briefDescription,
-            viewCount: doc.data().viewCount,
-            likeCount: doc.data().likeCount,
-            mod: doc.data().mod,
+        useEffect(() => {
+          const testFunction = async () => {
+            const snapshot = await getPostsFromUser(
+              props.userPosts,
+              "dateCreated",
+              "desc"
+            );
+            setSnapshot(snapshot);
+            snapshot.forEach((doc) => {
+              const date = getDate(doc.data().dateCreated.toDate());
+              let props = {
+                id: doc.data().id,
+                user: doc.data().user,
+                dateCreated: date,
+                title: doc.data().title,
+                briefDescription: doc.data().briefDescription,
+                viewCount: doc.data().viewCount,
+                likeCount: doc.data().likeCount,
+                mod: doc.data().mod,
+              };
+              setPostsdata((arr) => [...arr, <PostList {...props} />]);
+            });
           };
-          setPostsdata((arr) => [...arr, <PostList {...props} />]);
-        });
-      };
-      testFunction();
-    }, []);
+          testFunction();
+        }, []);
 
-    return <>{postsData.map((post) => post)}</>;
+        return <>{postsData.map((post) => post)}</>;
+      }
+      break;
+    default: {
+      const [snapshot, setSnapshot] = useState();
+      const [postsData, setPostsdata] = useState([]);
+
+      useEffect(() => {
+        const testFunction = async () => {
+          const snapshot = await getPosts("dateCreated", "desc");
+          setSnapshot(snapshot);
+          snapshot.forEach((doc) => {
+            const date = getDate(doc.data().dateCreated.toDate());
+            let props = {
+              id: doc.data().id,
+              user: doc.data().user,
+              dateCreated: date,
+              title: doc.data().title,
+              briefDescription: doc.data().briefDescription,
+              viewCount: doc.data().viewCount,
+              likeCount: doc.data().likeCount,
+              commentNo: doc.data().comments.length,
+              mod: doc.data().mod,
+            };
+            setPostsdata((arr) => [...arr, <PostList {...props} />]);
+          });
+        };
+        testFunction();
+      }, []);
+      return <>{postsData.map((post) => post)}</>;
+    }
   }
 }

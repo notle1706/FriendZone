@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import "./comments.css";
 import { getComment, getDate } from "../../firebase";
-import { DocumentSnapshot, toDate } from "firebase/firestore";
-
 export function CommentsList(props) {
   return (
     <>

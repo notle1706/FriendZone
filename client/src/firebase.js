@@ -1,7 +1,5 @@
-import firebase from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import {
   addDoc,
   collection,
@@ -23,8 +21,6 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
-import { React, useEffect, useState, useContext, createContext } from "react";
-
 const firebaseConfig = {
   apiKey: "AIzaSyAv_3evU8sGsA2-N5aaSc5V34BRFQmiH4M",
   authDomain: "friendzone-a76f3.firebaseapp.com",
@@ -42,12 +38,18 @@ export const auth = getAuth(app);
 
 export const storage = getStorage();
 
+// Add user information into firestore database, called upon creation of user
 export async function addUser(displayName, email) {
   try {
     const docRef = await setDoc(doc(firestore, "users", email), {
       displayName: displayName,
       email: email,
       posts: [],
+      modulesTaken: [],
+      comments: [],
+      profilePicture:
+        "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
+      friends: [],
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
@@ -55,17 +57,17 @@ export async function addUser(displayName, email) {
   }
 }
 
-export async function setUser(user, param, content) {
+export async function getAllUsers() {
   try {
-    const docRef = await setDoc(doc(firestore, "users", user), {
-      param: content,
-    });
-    console.log("Document written with ID: ", docRef.id);
+    const docRef = collection(firestore, "users");
+    const info = await getDocs(docRef);
+    return info;
   } catch (e) {
-    console.error("Error adding document: ", e);
+    console.error("Error reading document: ", e);
   }
 }
 
+// Gets a snapshot of the current user (param user is their email as user id is their email)
 export async function getUserInfo(user) {
   try {
     const docRef = doc(firestore, "users", user);
@@ -77,6 +79,7 @@ export async function getUserInfo(user) {
   }
 }
 
+// Returns email of user currently logged in
 export async function getUserEmail() {
   var email;
   await auth.onAuthStateChanged((user) => {
@@ -89,6 +92,7 @@ export async function getUserEmail() {
   return email;
 }
 
+// Edits the data of the user
 export async function setUserInfo(user, info, newInfo) {
   if (newInfo === null) {
     return;
@@ -111,6 +115,13 @@ export async function getPosts(order, dir) {
 export async function getPostsByMod(mod, order, dir) {
   const postsRef = collection(firestore, "posts");
   const q = query(postsRef, orderBy(order, dir), where("mod", "==", mod));
+  const snapShot = await getDocs(q);
+  return snapShot;
+}
+
+export async function getPostsFromUser(userPosts, order, dir) {
+  const postsRef = collection(firestore, "posts");
+  const q = query(postsRef, orderBy(order, dir), where("id", "in", userPosts));
   const snapShot = await getDocs(q);
   return snapShot;
 }
@@ -144,7 +155,7 @@ export async function newPost(user, title, mod, briefDescription, body) {
       briefDescription: briefDescription,
       body: body,
       dateCreated: Timestamp.now(),
-      likeCout: 0,
+      likeCount: 0,
       viewCount: 0,
       comments: [],
     });

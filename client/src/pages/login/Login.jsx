@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import "./login.css";
 import Topbar from "../../components/topbar/Topbar";
 import SideText from "../../components/sidetext/SideText";
 import SignIn from "../../components/signin/SignIn";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function Login() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
   return (
     <>
       <Topbar />

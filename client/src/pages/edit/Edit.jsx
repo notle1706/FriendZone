@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./edit.css";
 import {
-  auth,
   setUserInfo,
   getUserEmail,
   getUserInfo,
   uploadFiles,
 } from "../../firebase";
-import Select from "react-select";
 import { getModsData } from "../../packageHandler";
 import Dropdown from "../../components/dropdown/Dropdown";
-import Button from "react-bootstrap/Button";
-import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
 export default function Edit() {
   const [user, setUser] = useState("info placeholder");
@@ -20,7 +16,7 @@ export default function Edit() {
   const navigate = useNavigate();
 
   const routeBack = () => {
-    let path = "/dashboard/profile";
+    let path = "/dashboard/myProfile";
     navigate(path);
   };
 
