@@ -142,7 +142,15 @@ function Profile() {
 
               <div className="user text-center">
                 <div className="profile">
-                  <img src={picurl} className="rounded-circle" width="80" />
+                  <img
+                    src={picurl}
+                    className="rounded-circle"
+                    style={{
+                      height: "80px",
+                      width: "80px",
+                      objectFit: "cover",
+                    }}
+                  />
                 </div>
               </div>
 
