@@ -1,22 +1,20 @@
 import React, { useState } from "react";
 import "./sidebar.css";
-import { Menu, Close } from "@mui/icons-material";
+import { Menu } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { SidebarData } from "./SidebarData";
 import Fab from "@mui/material/Fab";
 
 export default function Sidebar() {
-  {
-    /* setSidebar is a hook that toggles the sidebar */
-  }
+  /* setSidebar is a hook that toggles the sidebar */
+
   const [sidebar, setSidebar] = useState(false);
   const showSidebar = () => setSidebar(!sidebar);
 
-  {
-    /* Each item in the sidebar should light up when
+  /* Each item in the sidebar should light up when
      that particular page is being accessed. 
      Not implimented yet*/
-  }
+
   const [clicked, setClicked] = useState(false);
   const clickItem = () => setClicked(true);
 

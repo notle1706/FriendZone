@@ -19,7 +19,7 @@ export const SidebarData = [
   },
   {
     title: "Profile",
-    path: "/dashboard/profile",
+    path: "/dashboard/myProfile",
     icon: <Person />,
     cName: "nav-text",
   },

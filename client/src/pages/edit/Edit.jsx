@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./edit.css";
 import {
-  auth,
   setUserInfo,
   getUserEmail,
   getUserInfo,
   uploadFiles,
+  deleteFiles,
 } from "../../firebase";
-import Select from "react-select";
 import { getModsData } from "../../packageHandler";
 import Dropdown from "../../components/dropdown/Dropdown";
-import Button from "react-bootstrap/Button";
-import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
 export default function Edit() {
   const [user, setUser] = useState("info placeholder");
@@ -20,7 +17,7 @@ export default function Edit() {
   const navigate = useNavigate();
 
   const routeBack = () => {
-    let path = "/dashboard/profile";
+    let path = "/dashboard/myProfile";
     navigate(path);
   };
 
@@ -133,36 +130,43 @@ export default function Edit() {
   const handleUploadImg = async (event) => {
     event.preventDefault();
     const file = event.target[0].files[0];
-    const url = await uploadFiles(file);
+    await deleteFiles(userEmail);
+    const url = await uploadFiles(file, userEmail);
     await setUserInfo(userEmail, "profilePicture", url);
   };
 
   return (
     <>
-      <div class="container-xl px-4 mt-4">
+      <div className="container-xl px-4 mt-4">
         {/* Account page navigation*/}
-        <hr class="mt-0 mb-4" />
-        <div class="row">
-          <div class="col-xl-4">
+        <hr className="mt-0 mb-4" />
+        <div className="row">
+          <div className="col-xl-4">
             {/* Profile picture card-edit*/}
-            <div class="card-edit mb-4 mb-xl-0">
-              <div class="card-edit-header">Profile Picture</div>
-              <div class="card-edit-body text-center">
+            <div className="card-edit mb-4 mb-xl-0">
+              <div className="card-edit-header">Profile Picture</div>
+              <div className="card-edit-body text-center">
                 {/* Profile picture image*/}
                 <img
-                  class="img-account-profile rounded-circle mb-2"
+                  className="img-account-profile rounded-circle mb-2"
                   src={picurl}
                   alt=""
+                  style={{
+                    height: "150px",
+                    width: "150px",
+                    objectFit: "cover",
+                  }}
                 />
                 {/* Profile picture help block*/}
-                <div class="small font-italic text-muted mb-4">
+                <div className="small font-italic text-muted mb-4">
                   JPG or PNG no larger than 5 MB
                 </div>
                 {/* Profile picture upload button*/}
                 <form onSubmit={handleUploadImg}>
                   <input
                     type="file"
-                    class="form-control-file"
+                    accept="image/*"
+                    className="form-control-file"
                     id="FormControlFile1"
                   />
                   <button type="submit">Upload pic</button>
@@ -170,22 +174,22 @@ export default function Edit() {
               </div>
             </div>
           </div>
-          <div class="col-xl-8">
+          <div className="col-xl-8">
             {/*Account details card-edit*/}
-            <div class="card-edit mb-4">
-              <div class="card-edit-header account-details">
+            <div className="card-edit mb-4">
+              <div className="card-edit-header account-details">
                 Account Details
               </div>
-              <div class="card-edit-body">
+              <div className="card-edit-body">
                 <form>
                   {/* Form Group (username)*/}
-                  <div class="mb-3">
-                    <label class="small mb-1" for="inputUsername">
+                  <div className="mb-3">
+                    <label className="small mb-1" for="inputUsername">
                       Username (how your name will appear to other users on the
                       site)
                     </label>
                     <input
-                      class="form-control"
+                      className="form-control"
                       id="inputUsername"
                       type="text"
                       placeholder="Enter your username"
@@ -196,14 +200,14 @@ export default function Edit() {
                     />
                   </div>
                   {/* Form Row*/}
-                  <div class="row gx-3 mb-3">
+                  <div className="row gx-3 mb-3">
                     {/* Form Group (first name)*/}
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="inputFirstName">
+                    <div className="col-md-6">
+                      <label className="small mb-1" for="inputFirstName">
                         First name
                       </label>
                       <input
-                        class="form-control"
+                        className="form-control"
                         id="inputFirstName"
                         type="text"
                         placeholder="Enter your first name"
@@ -214,12 +218,12 @@ export default function Edit() {
                       />
                     </div>
                     {/* Form Group (last name)*/}
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="inputLastName">
+                    <div className="col-md-6">
+                      <label className="small mb-1" for="inputLastName">
                         Last name
                       </label>
                       <input
-                        class="form-control"
+                        className="form-control"
                         id="inputLastName"
                         type="text"
                         placeholder="Enter your last name"
@@ -231,14 +235,14 @@ export default function Edit() {
                     </div>
                   </div>
                   {/* Form Row        */}
-                  <div class="row gx-3 mb-3">
+                  <div className="row gx-3 mb-3">
                     {/* Form Group (Course)*/}
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="inputCourse">
+                    <div className="col-md-6">
+                      <label className="small mb-1" for="inputCourse">
                         Course
                       </label>
                       <input
-                        class="form-control"
+                        className="form-control"
                         id="inputCourse"
                         type="text"
                         placeholder="Enter your Course"
@@ -249,12 +253,12 @@ export default function Edit() {
                       />
                     </div>
                     {/* Form Group (year)*/}
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="inputYear">
+                    <div className="col-md-6">
+                      <label className="small mb-1" for="inputYear">
                         Year of Study
                       </label>
                       <input
-                        class="form-control"
+                        className="form-control"
                         id="inputYear"
                         type="text"
                         placeholder="Enter your year of study"
@@ -266,8 +270,8 @@ export default function Edit() {
                     </div>
                   </div>
                   {/* Form Group (modules)*/}
-                  <div class="mb-3">
-                    <label class="small mb-1" for="inputModules">
+                  <div className="mb-3">
+                    <label className="small mb-1" for="inputModules">
                       Modules taken
                     </label>
                     <div className="ml-1">
@@ -279,12 +283,12 @@ export default function Edit() {
                     <div className="mt-2">{displayMods}</div>
                   </div>
                   {/* Form Group (email address)*/}
-                  <div class="mb-3">
-                    <label class="small mb-1" for="inputEmailAddress">
+                  <div className="mb-3">
+                    <label className="small mb-1" for="inputEmailAddress">
                       Email address
                     </label>
                     <input
-                      class="form-control"
+                      className="form-control"
                       id="inputEmailAddress"
                       type="email"
                       placeholder="Enter your email address"
@@ -292,14 +296,14 @@ export default function Edit() {
                     />
                   </div>
                   {/* Form Row*/}
-                  <div class="row gx-3 mb-3">
+                  <div className="row gx-3 mb-3">
                     {/* Form Group (telegram handle)*/}
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="inputTelegram">
+                    <div className="col-md-6">
+                      <label className="small mb-1" for="inputTelegram">
                         Telegram handle
                       </label>
                       <input
-                        class="form-control"
+                        className="form-control"
                         id="inputTelegram"
                         type="text"
                         placeholder="Enter your telegram handle"
@@ -310,12 +314,12 @@ export default function Edit() {
                       />
                     </div>
                     {/* Form Group (birthday)*/}
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="inputBirthday">
+                    <div className="col-md-6">
+                      <label className="small mb-1" for="inputBirthday">
                         Birthday
                       </label>
                       <input
-                        class="form-control"
+                        className="form-control"
                         id="inputBirthday"
                         type="text"
                         name="birthday"
@@ -329,7 +333,7 @@ export default function Edit() {
                   </div>
                   {/* Save changes button*/}
                   <button
-                    class="btn btn-primary"
+                    className="btn btn-primary"
                     type="button"
                     onClick={async () => {
                       await submitChanges();
@@ -339,7 +343,7 @@ export default function Edit() {
                     Save changes
                   </button>
                   <button
-                    class="btn btn-secondary discard-button"
+                    className="btn btn-secondary discard-button"
                     type="button"
                     onClick={routeBack}
                   >

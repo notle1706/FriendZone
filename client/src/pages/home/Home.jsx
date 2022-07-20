@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./home.css";
-import Calendar from "@ericz1803/react-google-calendar"
+import Calendar from "@ericz1803/react-google-calendar";
 import { css } from "@emotion/react";
 import { auth, getUserInfo, firestore, getUserEmail } from "../../firebase";
-
 
 const API_KEY = "AIzaSyAshjaeOnAhZ27gZ3nM59dUZkWOAtDPa_E";
 let calendars = [
   {
     calendarId: "friendzone.orbital2022@gmail.com",
-    color: "#B241D1"
+    color: "#B241D1",
   },
 ];
 
@@ -23,8 +22,8 @@ let styles = {
   today: css`
     color: blue;
     border: 1px solid blue;
-  `
-}
+  `,
+};
 
 function Home() {
   const [userInfo, setUserInfo] = useState("info placeholder");
@@ -49,11 +48,8 @@ function Home() {
           <div className="col-sm-2"><Calendar apiKey={API_KEY} calendars={calendars} styles={styles} /></div>
         </div>
       </div>
-
     </>
-
-  )
+  );
 }
-
 
 export default Home;

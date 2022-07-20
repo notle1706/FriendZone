@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./discussions.css";
 import Dropdown from "../../components/dropdown/Dropdown";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Posts from "../../components/posts/Posts";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import Alert from "react-bootstrap/Alert";
-import { Link } from "react-router-dom";
 import {
   newPost,
   getUserEmail,
@@ -17,7 +14,6 @@ import {
   setUserInfo,
 } from "../../firebase";
 import Nav from "react-bootstrap/Nav";
-import { SignalWifiStatusbarNullSharp } from "@mui/icons-material";
 
 function Discussions() {
   const [errormsg, setErrormsg] = useState(false);
@@ -63,12 +59,6 @@ function Discussions() {
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css"
-        integrity="sha256-46r060N2LrChLLb5zowXQ72/iKKNiw/lAmygmHExk/o="
-        crossOrigin="anonymous"
-      />
       <div className="container">
         <div className="main-body p-0">
           <div className="inner-wrapper">
@@ -148,7 +138,7 @@ function Discussions() {
                   <input
                     type="text"
                     className="form-control form-control-sm bg-gray-200 border-gray-200 shadow-none mb-4 mt-4"
-                    placeholder="Search forum"
+                    placeholder="Search forum (not working yet)"
                   />
                 </span>
               </div>

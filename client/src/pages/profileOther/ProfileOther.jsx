@@ -1,15 +1,17 @@
-import "./profile.css";
+import "./profileother.css";
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { getUserInfo, getUserEmail } from "../../firebase";
+import { useNavigate, useParams } from "react-router-dom";
+import { getUserInfo, getUserEmail, setUserInfo } from "../../firebase";
 import Posts from "../../components/posts/Posts";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 function ProfileData(props) {
   return (
     <>
       <div className="col d-flex justify-content-center">
         <div className="card">
-          <h3 className="module-text">My Modules</h3>
+          <h3 className="module-text">Modules</h3>
           <div>{props.displayMods}</div>
         </div>
       </div>
@@ -36,8 +38,10 @@ function MyComments() {
   );
 }
 
-function Profile() {
-  const [userInfo, setUserInfo] = useState("info placeholder");
+function ProfileOther() {
+  const params = useParams();
+  const [ownUserEmail, setOwnUserEmail] = useState();
+  const [info, setInfo] = useState("info placeholder");
   const [userEmail, setUserEmail] = useState();
   const [postNo, setPostno] = useState();
   const [commentNo, setCommentNo] = useState();
@@ -46,17 +50,25 @@ function Profile() {
   const [picurl, setPicUrl] = useState();
   const [profilePage, setProfilePage] = useState("profile");
   const [userPosts, setUserPosts] = useState();
+  const [reqSent, setReqSent] = useState();
+  const [showModal, setShowModal] = useState(false);
+  const [ownFriend, setOwnFriend] = useState(true);
   useEffect(() => {
     const getData = async () => {
-      const newUserEmail = await getUserEmail();
-      const userInfo = await getUserInfo(newUserEmail);
+      const newUserEmail = params.id;
+      const info = await getUserInfo(newUserEmail);
+      const ownEmail = await getUserEmail();
+      const ownInfo = await getUserInfo(ownEmail);
+      setOwnUserEmail(ownEmail);
       setUserEmail(newUserEmail);
-      setUserInfo(userInfo);
-      setPostno(userInfo.posts.length);
-      setMods(userInfo.modulesTaken);
-      setPicUrl(userInfo.profilePicture);
-      setUserPosts(userInfo.posts);
-      setCommentNo(userInfo.comments.length);
+      setInfo(info);
+      setPostno(info.posts.length);
+      setMods(info.modulesTaken);
+      setPicUrl(info.profilePicture);
+      setUserPosts(info.posts);
+      setCommentNo(info.comments.length);
+      setReqSent(ownInfo.friendReq.includes(newUserEmail));
+      setOwnFriend(ownInfo.friends.includes(newUserEmail));
     };
     getData();
     return () => console.log("get user data cleanup");
@@ -81,6 +93,18 @@ function Profile() {
 
   let navigate = useNavigate();
 
+  async function addFriend() {
+    const ownInfo = await getUserInfo(ownUserEmail);
+    await setUserInfo(ownUserEmail, "friendReq", [
+      ...ownInfo.friendReq,
+      userEmail,
+    ]);
+    await setUserInfo(userEmail, "incFriendReq", [
+      ...info.incFriendReq,
+      ownUserEmail,
+    ]);
+  }
+
   return (
     <>
       <div className="container-fluid profile-navigation pt-4 px-5">
@@ -93,7 +117,7 @@ function Profile() {
               }
               onClick={() => setProfilePage("profile")}
             >
-              My Profile
+              Profile
             </a>
           </li>
           <li className="nav-item">
@@ -104,7 +128,7 @@ function Profile() {
               }
               onClick={() => setProfilePage("posts")}
             >
-              My posts
+              Posts
             </a>
           </li>
           <li className="nav-item">
@@ -115,7 +139,7 @@ function Profile() {
               }
               onClick={() => setProfilePage("comments")}
             >
-              My comments
+              Comments
             </a>
           </li>
         </ul>
@@ -142,33 +166,15 @@ function Profile() {
 
               <div className="user text-center">
                 <div className="profile">
-                  <img
-                    src={picurl}
-                    className="rounded-circle"
-                    style={{
-                      height: "80px",
-                      width: "80px",
-                      objectFit: "cover",
-                    }}
-                  />
+                  <img src={picurl} className="rounded-circle" width="80" />
                 </div>
               </div>
 
               <div className="mt-5 text-center">
-                <h4 className="mb-0">{userInfo.displayName}</h4>
+                <h4 className="mb-0">{info.displayName}</h4>
                 <span className="text-muted d-block mb-2">
-                  {userInfo.teleHandle}
+                  {info.teleHandle}
                 </span>
-
-                <button className="btn btn-primary btn-sm follow">
-                  <Link
-                    className="text-light"
-                    style={{ textDecoration: "none" }}
-                    to="/dashboard/edit"
-                  >
-                    Edit profile
-                  </Link>
-                </button>
 
                 <div className="d-flex justify-content-between align-items-center mt-4 px-4">
                   <div className="stats">
@@ -186,6 +192,34 @@ function Profile() {
                     <span>129</span>
                   </div>
                 </div>
+                <div>
+                  {ownUserEmail != userEmail && !ownFriend ? (
+                    reqSent ? (
+                      <button type="button" class="btn btn-primary" disabled>
+                        Friend request sent!
+                      </button>
+                    ) : (
+                      <Button
+                        onClick={async () => {
+                          await addFriend();
+                          setShowModal(true);
+                        }}
+                      >
+                        Add friend
+                      </Button>
+                    )
+                  ) : null}
+                </div>
+                <Modal
+                  show={showModal}
+                  onHide={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  <Modal.Header closeButton></Modal.Header>
+                  <Modal.Body>Friend request sent!</Modal.Body>
+                  <Modal.Footer></Modal.Footer>
+                </Modal>
               </div>
             </div>
           </div>
@@ -195,4 +229,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default ProfileOther;

@@ -8,6 +8,7 @@ import {
   newComment,
   getUserInfo,
   getDate,
+  setUserInfo,
 } from "../../firebase";
 import { updateDoc } from "firebase/firestore";
 import Modal from "react-bootstrap/Modal";
@@ -53,6 +54,8 @@ export default function PostPage() {
     const userInfo = await getUserInfo(userEmail);
     const commentId = await newComment(userInfo.displayName, commentbody);
     const docRef = await getRawPost(params.id);
+    const comments = userInfo.comments;
+    setUserInfo(userEmail, "comments", [...comments, commentId]);
 
     await updateDoc(docRef, { comments: [...comments, commentId] });
   }

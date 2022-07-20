@@ -7,7 +7,6 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, addUser } from "../../firebase";
-import { SettingsInputAntennaTwoTone } from "@mui/icons-material";
 
 export default function SignIn(props) {
   var currentUser = "";
@@ -138,7 +137,7 @@ export default function SignIn(props) {
             </span>
           </div>
           <div className="form-group mt-3">
-            <label>Full Name</label>
+            <label>Display name</label>
             <input
               className="form-control mt-1"
               onChange={(event) => {
