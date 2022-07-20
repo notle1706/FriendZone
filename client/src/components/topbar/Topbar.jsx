@@ -19,6 +19,8 @@ import { getUserInfo } from "../../firebase";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import FriendReq from "../friendreq/FriendReq";
+import Popover from "react-bootstrap/Popover";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 
 export function FriendModal(props) {
   return (
@@ -51,6 +53,7 @@ function Topbar() {
   const [friendReq, setFriendReq] = useState([]);
   const [friendModalShow, setFriendModalShow] = useState(false);
   const [ownEmail, setOwnEmail] = useState();
+  const [unreadMsg, setUnreadMsg] = useState(0);
   const navigate = useNavigate();
 
   useEffect(
@@ -62,11 +65,32 @@ function Topbar() {
           setUser(info);
           setFriendReq(info.incFriendReq);
           setOwnEmail(info.email);
+          setUnreadMsg(info.unreadMsg);
         } else {
           setLoggedIn(false);
         }
       }),
     []
+  );
+
+  const popoverFriends = (
+    <Popover id="popover-positioned-bottom">
+      <Popover.Body>
+        <div>You have no new Friend requests!</div>
+      </Popover.Body>
+    </Popover>
+  );
+
+  const popoverMsg = (
+    <Popover id="popover-positioned-bottom">
+      <Popover.Header as="h3">Messages</Popover.Header>
+      <Popover.Body>
+        <div>You have {!unreadMsg ? 0 : unreadMsg} new Messages!</div>
+      </Popover.Body>
+      <Button variant="link" onClick={() => navigate("/dashboard/messages")}>
+        Go to your messages
+      </Button>
+    </Popover>
   );
 
   const auth = getAuth();
@@ -102,31 +126,48 @@ function Topbar() {
             <div className="col d-flex flex-row-reverse">
               <span>
                 <span>
-                  <button
-                    type="button"
-                    className="btn btn-primary me-3 position-relative"
-                    onClick={() => {
-                      return friendReq.length === 0
-                        ? null
-                        : setFriendModalShow(true);
-                    }}
+                  <OverlayTrigger
+                    trigger={friendReq.length === 0 ? "click" : null}
+                    placement="bottom"
+                    overlay={popoverFriends}
                   >
-                    <Person />
-                    {friendReq.length === 0 ? null : (
-                      <span className="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger">
-                        {friendReq.length}
-                        <span className="visually-hidden">friend requests</span>
-                      </span>
-                    )}
-                  </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary me-3 position-relative"
+                      onClick={() => {
+                        return friendReq.length === 0
+                          ? null
+                          : setFriendModalShow(true);
+                      }}
+                    >
+                      <Person />
+                      {friendReq.length === 0 ? null : (
+                        <span className="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger">
+                          {friendReq.length}
+                          <span className="visually-hidden">
+                            friend requests
+                          </span>
+                        </span>
+                      )}
+                    </button>
+                  </OverlayTrigger>
                 </span>
                 <span>
-                  <button className="btn btn-primary me-3 position-relative">
-                    <Chat />
-                    <span className="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger">
-                      2<span className="visually-hidden">messages</span>
-                    </span>
-                  </button>
+                  <OverlayTrigger
+                    trigger="click"
+                    placement="bottom"
+                    overlay={popoverMsg}
+                  >
+                    <button className="btn btn-primary me-3 position-relative">
+                      <Chat />
+                      {!unreadMsg ? null : (
+                        <span className="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger">
+                          {unreadMsg}
+                          <span className="visually-hidden">messages</span>
+                        </span>
+                      )}
+                    </button>
+                  </OverlayTrigger>
                 </span>
                 <span>
                   <button className="btn btn-primary me-3 position-relative">

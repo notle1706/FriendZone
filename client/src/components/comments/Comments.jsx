@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./comments.css";
-import { getComment, getDate } from "../../firebase";
+import { useNavigate } from "react-router-dom";
+import { getComment, getDate, getUserInfo } from "../../firebase";
 export function CommentsList(props) {
+  const navigate = useNavigate();
   return (
     <>
       <div className="inner-main-body p-2 p-sm-3 forum-content">
@@ -10,10 +12,18 @@ export function CommentsList(props) {
             <div className="media forum-item">
               <a className="post-link">
                 <img
-                  src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                  type="button"
+                  src={props.profilePic}
                   className="rounded-circle"
                   width="50"
                   alt="User"
+                  onClick={
+                    props.userEmail === "Anonymous"
+                      ? null
+                      : () => {
+                          navigate(`/dashboard/profile/${props.userEmail}`);
+                        }
+                  }
                 />
               </a>
               <div className="media-body ml-3">
@@ -42,9 +52,15 @@ export default function Comments(props) {
       props.comments.forEach((docId) => {
         (async () => {
           const doc = await getComment(docId);
+          const userInfo = await getUserInfo(doc.user);
           console.log(doc);
           let props = {
-            user: doc.user,
+            userEmail: doc.user,
+            user: doc.user === "Anonymous" ? "Anonymous" : userInfo.displayName,
+            profilePic:
+              doc.user === "Anonymous"
+                ? "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
+                : userInfo.profilePicture,
             dateCreated: getDate(doc.dateCreated.toDate()),
             body: doc.body,
             likeCount: doc.likeCount,

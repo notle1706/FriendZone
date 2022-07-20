@@ -10,6 +10,7 @@ import {
   uploadFiles,
   getUnreadCount,
   updateUnreadCount,
+  setUserInfo,
 } from "../../firebase";
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto";
 import Moment from "react-moment";
@@ -213,8 +214,11 @@ function Messages() {
       });
       setMsgs(msgs);
     });
-    await updateUnreadCount(user1, user2, 0);
+    const unreadCount = getUnreadCount(user1, user2);
 
+    const myInfo = await getUserInfo(user1);
+    await setUserInfo(user1, "unreadMsg", myInfo.unreadMsg - unreadCount);
+    await updateUnreadCount(user1, user2, 0);
     setSelectedUser(user);
   };
 
@@ -231,6 +235,8 @@ function Messages() {
     const unreadCount = await getUnreadCount(user2, user1);
     await sendMessage(text, user1, user2, url);
     await updateUnreadCount(user2, user1, unreadCount + 1);
+    const theirInfo = await getUserInfo(user2);
+    await setUserInfo(user2, "unreadMsg", theirInfo.unreadMsg + 1);
     setText("");
   };
 

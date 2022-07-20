@@ -26,6 +26,14 @@ function Discussions() {
   const [desc, setDesc] = useState();
   const [discbody, setDiscbody] = useState();
   const [searchmod, setSearchMod] = useState();
+  const [anon, setAnon] = useState(false);
+
+  const handleSetAnon = () => {
+    setAnon(!anon);
+  };
+  const initAnon = () => {
+    setAnon(false);
+  };
 
   const handleChange = (event) => {
     setPageContents(event.value);
@@ -41,16 +49,15 @@ function Discussions() {
     const userEmail = await getUserEmail();
     const userInfo = await getUserInfo(userEmail);
 
-    const newpost = await newPost(
-      userInfo.displayName,
-      title,
-      mod,
-      desc,
-      discbody
-    );
+    const newpost = await newPost(userInfo.email, title, mod, desc, discbody);
     const postAppend = [...userInfo.posts, newpost];
     setUserInfo(userEmail, "posts", postAppend);
   }
+
+  async function createAnonPost() {
+    await newPost("Anonymous", title, mod, desc, discbody);
+  }
+
   function contentsEmpty() {
     if (!title || !mod || !desc || !discbody) {
       return true;
@@ -69,7 +76,10 @@ function Discussions() {
                 <button
                   className="btn btn-primary has-icon btn-block"
                   type="button"
-                  onClick={handleShow}
+                  onClick={() => {
+                    handleShow();
+                    initAnon();
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -214,6 +224,13 @@ function Discussions() {
                   <Form.Label>Discuss!</Form.Label>
                   <Form.Control as="textarea" rows={3} />
                 </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                  <Form.Check
+                    type="checkbox"
+                    label="Stay anonymous"
+                    onChange={handleSetAnon}
+                  />
+                </Form.Group>
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
@@ -225,7 +242,7 @@ function Discussions() {
                     if (contentsEmpty()) {
                       setErrormsg(true);
                     } else {
-                      createPost();
+                      anon ? createAnonPost() : createPost();
                       handleClose();
                     }
                   }}

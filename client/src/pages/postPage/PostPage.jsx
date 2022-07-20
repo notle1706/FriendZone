@@ -9,6 +9,7 @@ import {
   getUserInfo,
   getDate,
   setUserInfo,
+  newAnonComment,
 } from "../../firebase";
 import { updateDoc } from "firebase/firestore";
 import Modal from "react-bootstrap/Modal";
@@ -32,12 +33,24 @@ export default function PostPage() {
   const [likeCount, setLikeCount] = useState();
   const [viewCount, setViewCount] = useState();
   const [mod, setMod] = useState();
+  const [profilePic, setProfilePic] = useState();
+  const [anon, setAnon] = useState(false);
+  const [postEmail, setPostEmail] = useState("");
 
   useEffect(() => {
     const tempFunc = async () => {
       const thisPost = await getPost(params.id);
+      const userInfo = await getUserInfo(thisPost.user);
+      setPostEmail(thisPost.user);
       setThisPost(thisPost);
-      setUser(thisPost.user);
+      setUser(
+        thisPost.user === "Anonymous" ? "Anonymous" : userInfo.displayName
+      );
+      setProfilePic(
+        thisPost.user === "Anonymous"
+          ? "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
+          : userInfo.profilePicture
+      );
       setTitle(thisPost.title);
       setDiscbody(thisPost.body);
       setTime(getDate(thisPost.dateCreated.toDate()));
@@ -49,13 +62,26 @@ export default function PostPage() {
     tempFunc();
   }, []);
 
+  const handleSetAnon = () => {
+    setAnon(!anon);
+  };
+  const initAnon = () => {
+    setAnon(false);
+  };
+
   async function createComment() {
     const userEmail = await getUserEmail();
     const userInfo = await getUserInfo(userEmail);
-    const commentId = await newComment(userInfo.displayName, commentbody);
+    const commentId = await newComment(userEmail, commentbody);
     const docRef = await getRawPost(params.id);
     const comments = userInfo.comments;
     setUserInfo(userEmail, "comments", [...comments, commentId]);
+
+    await updateDoc(docRef, { comments: [...comments, commentId] });
+  }
+  async function createAnonComment() {
+    const commentId = await newComment("Anonymous", commentbody);
+    const docRef = await getRawPost(params.id);
 
     await updateDoc(docRef, { comments: [...comments, commentId] });
   }
@@ -69,10 +95,17 @@ export default function PostPage() {
             <div className="media forum-item">
               <a className="post-link">
                 <img
-                  src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                  type="button"
+                  src={profilePic}
                   className="rounded-circle"
                   width="50"
                   alt="User"
+                  style={{ objectFit: "cover" }}
+                  onClick={
+                    postEmail === "Anonymous"
+                      ? null
+                      : () => navigate(`/dashboard/profile/${postEmail}`)
+                  }
                 />
               </a>
               <span>{mod}</span>
@@ -89,7 +122,13 @@ export default function PostPage() {
                 <span>
                   <i className="far fa-comment ml-2"></i> {0}
                 </span>
-                <Button variant="link" onClick={handleShow}>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    handleShow();
+                    initAnon();
+                  }}
+                >
                   Add comment
                 </Button>
               </div>
@@ -111,6 +150,13 @@ export default function PostPage() {
               <Form.Label>Comment here</Form.Label>
               <Form.Control as="textarea" rows={3} />
             </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicCheckbox">
+              <Form.Check
+                type="checkbox"
+                label="Stay anonymous"
+                onChange={handleSetAnon}
+              />
+            </Form.Group>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
@@ -119,7 +165,7 @@ export default function PostPage() {
             <Button
               variant="primary"
               onClick={() => {
-                createComment();
+                anon ? createAnonComment() : createComment();
                 handleClose();
               }}
             >

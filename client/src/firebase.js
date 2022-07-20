@@ -54,6 +54,7 @@ export async function addUser(displayName, email) {
       friends: [],
       friendReq: [],
       incFriendReq: [],
+      unreadMsg: 0,
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
