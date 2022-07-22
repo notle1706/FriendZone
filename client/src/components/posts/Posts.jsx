@@ -76,7 +76,9 @@ export default function Posts(props) {
               "desc"
             );
             setSnapshot(snapshot);
-            snapshot.forEach(async (doc) => {
+            var snapshotArray = [];
+            snapshot.forEach((doc) => snapshotArray.push(doc));
+            for (const doc of snapshotArray) {
               const date = getDate(doc.data().dateCreated.toDate());
               let props;
 
@@ -97,7 +99,7 @@ export default function Posts(props) {
               };
 
               setPostsdata((arr) => [...arr, <PostList {...props} />]);
-            });
+            }
           };
           testFunction();
         }, []);
@@ -118,7 +120,10 @@ export default function Posts(props) {
               "desc"
             );
             setSnapshot(snapshot);
-            snapshot.forEach(async (doc) => {
+            var snapshotArray = [];
+            snapshot.forEach((doc) => snapshotArray.push(doc));
+
+            for (const doc of snapshotArray) {
               const date = getDate(doc.data().dateCreated.toDate());
               let props;
 
@@ -139,7 +144,7 @@ export default function Posts(props) {
               };
 
               setPostsdata((arr) => [...arr, <PostList {...props} />]);
-            });
+            }
           };
           testFunction();
         }, []);
@@ -155,11 +160,16 @@ export default function Posts(props) {
         const testFunction = async () => {
           const snapshot = await getPosts("dateCreated", "desc");
           setSnapshot(snapshot);
-          snapshot.forEach(async (doc) => {
+          var snapshotArray = [];
+          snapshot.forEach((doc) => snapshotArray.push(doc));
+          for (const doc of snapshotArray) {
             const date = getDate(doc.data().dateCreated.toDate());
             let props;
 
-            const userInfo = await getUserInfo(doc.data().user);
+            const userInfo =
+              doc.data().user === "Anonymous"
+                ? null
+                : await getUserInfo(doc.data().user);
             props = {
               userEmail: doc.data().user,
               id: doc.data().id,
@@ -176,7 +186,7 @@ export default function Posts(props) {
             };
 
             setPostsdata((arr) => [...arr, <PostList {...props} />]);
-          });
+          }
         };
         testFunction();
       }, []);

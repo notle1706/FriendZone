@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "@emotion/react": "^11.9.3",
-    "@ericz1803/react-google-calendar": "^4.2.1",
     "react": "^18.2.0",
+    "react-calendar": "^3.7.0",
     "react-dom": "^18.2.0"
   }
 }

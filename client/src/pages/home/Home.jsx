@@ -1,33 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./home.css";
-import Calendar from "@ericz1803/react-google-calendar";
+import "react-calendar/dist/Calendar.css";
+import Calendar from "react-calendar";
 import { css } from "@emotion/react";
 import { auth, getUserInfo, firestore, getUserEmail } from "../../firebase";
-
-const API_KEY = "AIzaSyAshjaeOnAhZ27gZ3nM59dUZkWOAtDPa_E";
-let calendars = [
-  {
-    calendarId: "friendzone.orbital2022@gmail.com",
-    color: "#B241D1",
-  },
-];
-
-let styles = {
-  //you can use object styles (no import required)
-  calendar: {
-    borderWidth: "10px", //make outer edge of calendar thicker
-  },
-
-  //you can also use emotion's string styles
-  today: css`
-    color: blue;
-    border: 1px solid blue;
-  `,
-};
 
 function Home() {
   const [userInfo, setUserInfo] = useState("info placeholder");
   const [userEmail, setUserEmail] = useState();
+  const [value, setValue] = useState(new Date());
 
   useEffect(() => {
     const getData = async () => {
@@ -42,10 +23,15 @@ function Home() {
 
   return (
     <>
-      <div className="container">
+      <div className="container-fluid">
         <div className="row">
-          <div className="col-sm-10"><h1>Welcome Back {userInfo.displayName}</h1></div>
-          <div className="col-sm-2"><Calendar apiKey={API_KEY} calendars={calendars} styles={styles} /></div>
+          <div className="col-sm-4 p-4">
+            <h2>Welcome back, {userInfo.displayName}!</h2>
+          </div>
+          <div className="col-sm-4"></div>
+          <div className="col-sm-4 p-4 d-flex flex-row-reverse">
+            <Calendar value={value} />
+          </div>
         </div>
       </div>
     </>

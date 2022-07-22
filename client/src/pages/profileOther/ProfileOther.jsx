@@ -15,7 +15,7 @@ function ProfileData(props) {
           <div>{props.displayMods}</div>
         </div>
       </div>
-      <div className="col d-flex justify-content-center">2</div>
+      <div className="col d-flex justify-content-center"></div>
     </>
   );
 }
