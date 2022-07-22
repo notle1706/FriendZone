@@ -94,7 +94,7 @@ export default function PostPage() {
     await setUserInfo(userEmail, "comments", [...comments, commentId]);
 
     await updateDoc(docRef, { comments: [...comments, commentId] });
-    if (myEmail != userEmail) {
+    if (postEmail != userEmail) {
       await createUserNotification(postEmail, userEmail, params.id);
     }
   }

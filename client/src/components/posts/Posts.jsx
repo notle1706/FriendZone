@@ -79,35 +79,22 @@ export default function Posts(props) {
             snapshot.forEach(async (doc) => {
               const date = getDate(doc.data().dateCreated.toDate());
               let props;
-              if (doc.data().user !== "Anonymous") {
-                const userInfo = await getUserInfo(doc.data().user);
-                props = {
-                  userEmail: doc.data().user,
-                  id: doc.data().id,
-                  user: userInfo.displayName,
-                  dateCreated: date,
-                  title: doc.data().title,
-                  briefDescription: doc.data().briefDescription,
-                  viewCount: doc.data().viewCount,
-                  likeCount: doc.data().likeCount,
-                  mod: doc.data().mod,
-                  profilePic: userInfo.profilePicture,
-                };
-              } else {
-                props = {
-                  userEmail: doc.data().user,
-                  id: doc.data().id,
-                  user: "Anonymous",
-                  dateCreated: date,
-                  title: doc.data().title,
-                  briefDescription: doc.data().briefDescription,
-                  viewCount: doc.data().viewCount,
-                  likeCount: doc.data().likeCount,
-                  mod: doc.data().mod,
-                  profilePic:
-                    "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
-                };
-              }
+
+              const userInfo = await getUserInfo(doc.data().user);
+              props = {
+                userEmail: doc.data().user,
+                id: doc.data().id,
+                user: userInfo ? userInfo.displayName : "Anonymous",
+                dateCreated: date,
+                title: doc.data().title,
+                briefDescription: doc.data().briefDescription,
+                viewCount: doc.data().viewCount,
+                likeCount: doc.data().likeCount,
+                mod: doc.data().mod,
+                profilePic: userInfo
+                  ? userInfo.profilePicture
+                  : "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
+              };
 
               setPostsdata((arr) => [...arr, <PostList {...props} />]);
             });
@@ -134,35 +121,23 @@ export default function Posts(props) {
             snapshot.forEach(async (doc) => {
               const date = getDate(doc.data().dateCreated.toDate());
               let props;
-              if (doc.data().user !== "Anonymous") {
-                const userInfo = await getUserInfo(doc.data().user);
-                props = {
-                  userEmail: doc.data().user,
-                  id: doc.data().id,
-                  user: userInfo.displayName,
-                  dateCreated: date,
-                  title: doc.data().title,
-                  briefDescription: doc.data().briefDescription,
-                  viewCount: doc.data().viewCount,
-                  likeCount: doc.data().likeCount,
-                  mod: doc.data().mod,
-                  profilePic: userInfo.profilePicture,
-                };
-              } else {
-                props = {
-                  userEmail: doc.data().user,
-                  id: doc.data().id,
-                  user: "Anonymous",
-                  dateCreated: date,
-                  title: doc.data().title,
-                  briefDescription: doc.data().briefDescription,
-                  viewCount: doc.data().viewCount,
-                  likeCount: doc.data().likeCount,
-                  mod: doc.data().mod,
-                  profilePic:
-                    "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
-                };
-              }
+
+              const userInfo = await getUserInfo(doc.data().user);
+              props = {
+                userEmail: doc.data().user,
+                id: doc.data().id,
+                user: userInfo ? userInfo.displayName : "Anonymous",
+                dateCreated: date,
+                title: doc.data().title,
+                briefDescription: doc.data().briefDescription,
+                viewCount: doc.data().viewCount,
+                likeCount: doc.data().likeCount,
+                mod: doc.data().mod,
+                profilePic: userInfo
+                  ? userInfo.profilePicture
+                  : "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
+              };
+
               setPostsdata((arr) => [...arr, <PostList {...props} />]);
             });
           };
@@ -183,35 +158,23 @@ export default function Posts(props) {
           snapshot.forEach(async (doc) => {
             const date = getDate(doc.data().dateCreated.toDate());
             let props;
-            if (doc.data().user !== "Anonymous") {
-              const userInfo = await getUserInfo(doc.data().user);
-              props = {
-                userEmail: doc.data().user,
-                id: doc.data().id,
-                user: userInfo.displayName,
-                dateCreated: date,
-                title: doc.data().title,
-                briefDescription: doc.data().briefDescription,
-                viewCount: doc.data().viewCount,
-                likeCount: doc.data().likeCount,
-                mod: doc.data().mod,
-                profilePic: userInfo.profilePicture,
-              };
-            } else {
-              props = {
-                userEmail: doc.data().user,
-                id: doc.data().id,
-                user: "Anonymous",
-                dateCreated: date,
-                title: doc.data().title,
-                briefDescription: doc.data().briefDescription,
-                viewCount: doc.data().viewCount,
-                likeCount: doc.data().likeCount,
-                mod: doc.data().mod,
-                profilePic:
-                  "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
-              };
-            }
+
+            const userInfo = await getUserInfo(doc.data().user);
+            props = {
+              userEmail: doc.data().user,
+              id: doc.data().id,
+              user: userInfo ? userInfo.displayName : "Anonymous",
+              dateCreated: date,
+              title: doc.data().title,
+              briefDescription: doc.data().briefDescription,
+              viewCount: doc.data().viewCount,
+              likeCount: doc.data().likeCount,
+              mod: doc.data().mod,
+              profilePic: userInfo
+                ? userInfo.profilePicture
+                : "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
+            };
+
             setPostsdata((arr) => [...arr, <PostList {...props} />]);
           });
         };

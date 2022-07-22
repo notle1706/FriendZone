@@ -242,11 +242,11 @@ function Discussions() {
                 </Button>
                 <Button
                   variant="primary"
-                  onClick={() => {
+                  onClick={async () => {
                     if (contentsEmpty()) {
                       setErrormsg(true);
                     } else {
-                      anon ? createAnonPost() : createPost();
+                      anon ? await createAnonPost() : await createPost();
                       handleClose();
                       refreshPage();
                     }
