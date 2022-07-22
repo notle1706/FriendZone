@@ -63,6 +63,46 @@ export function PostList(props) {
 
 export default function Posts(props) {
   switch (true) {
+    case props.homepg != null: {
+      const [snapshot, setSnapshot] = useState();
+      const [postsData, setPostsdata] = useState([]);
+
+      useEffect(() => {
+        const testFunction = async () => {
+          const snapshot = await getPosts("dateCreated", "desc");
+          setSnapshot(snapshot);
+          var snapshotArray = [];
+          snapshot.forEach((doc) => snapshotArray.push(doc));
+          for (const doc of snapshotArray.slice(0, 3)) {
+            const date = getDate(doc.data().dateCreated.toDate());
+            let props;
+
+            const userInfo =
+              doc.data().user === "Anonymous"
+                ? null
+                : await getUserInfo(doc.data().user);
+            props = {
+              userEmail: doc.data().user,
+              id: doc.data().id,
+              user: userInfo ? userInfo.displayName : "Anonymous",
+              dateCreated: date,
+              title: doc.data().title,
+              briefDescription: doc.data().briefDescription,
+              viewCount: doc.data().viewCount,
+              likeCount: doc.data().likeCount,
+              mod: doc.data().mod,
+              profilePic: userInfo
+                ? userInfo.profilePicture
+                : "https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg",
+            };
+
+            setPostsdata((arr) => [...arr, <PostList {...props} />]);
+          }
+        };
+        testFunction();
+      }, []);
+      return <>{postsData.map((post) => post)}</>;
+    }
     case props.mod != null:
       {
         const [snapshot, setSnapshot] = useState();

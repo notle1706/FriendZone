@@ -4,6 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import { css } from "@emotion/react";
 import { auth, getUserInfo, firestore, getUserEmail } from "../../firebase";
+import Posts from "../../components/posts/Posts";
 
 function Home() {
   const [userInfo, setUserInfo] = useState("info placeholder");
@@ -28,9 +29,14 @@ function Home() {
           <div className="col-sm-4 p-4">
             <h2>Welcome back, {userInfo.displayName}!</h2>
           </div>
-          <div className="col-sm-4"></div>
+          <div className="col-sm-4 p-4">
+            <h2>Latest posts</h2>
+            <Posts homepg="homepg" />
+          </div>
           <div className="col-sm-4 p-4 d-flex flex-row-reverse">
-            <Calendar value={value} />
+            <div>
+              <Calendar value={value} />
+            </div>
           </div>
         </div>
       </div>
