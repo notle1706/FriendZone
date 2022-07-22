@@ -27,7 +27,7 @@ export default function SignIn(props) {
   const [loginPassword, setLoginPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError, code] = useState("");
 
   function sError(str) {
     setLoading(true);
@@ -37,6 +37,9 @@ export default function SignIn(props) {
   const register = async () => {
     if (registerPassword !== confirmPassword) {
       sError("Passwords do not match");
+      return;
+    } else if (!fullName) {
+      sError("Please fill up all empty fields.");
       return;
     }
     createUserWithEmailAndPassword(auth, registerEmail, registerPassword)
@@ -52,7 +55,11 @@ export default function SignIn(props) {
           })
           .catch((error) => sError(error.message));
       })
-      .catch((error) => sError("Please fill in all the fields"));
+      .catch((error) => sError(error.code == 'auth/email-already-in-use'
+        ? "Email already exists. Please login with the email."
+        : error.code == 'auth/weak-password'
+          ? "Weak Password. Password has to have at least 6 characters"
+          : "Please fill up all empty fields."));
   };
 
   const login = async () => {
@@ -60,7 +67,9 @@ export default function SignIn(props) {
       .then((userCredentials) => {
         navigate("/dashboard/home");
       })
-      .catch((error) => sError("Incorrect email or password!"));
+      .catch((error) => sError(error.code == 'auth/wrong-password'
+        ? "Wrong Password!"
+        : "Email not registered!"));
   };
 
   let [authMode, setAuthMode] = useState("signin");
