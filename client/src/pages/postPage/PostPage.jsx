@@ -9,21 +9,28 @@ import {
   getUserInfo,
   getDate,
   setUserInfo,
-  newAnonComment,
+  createUserNotification,
+  removePost,
+  removeComment,
 } from "../../firebase";
 import { updateDoc } from "firebase/firestore";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Comments from "../../components/comments/Comments";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function PostPage() {
   const navigate = useNavigate();
   const [commentbody, setCommentbody] = useState();
   const params = useParams();
+  const [myEmail, setMyEmail] = useState();
   const [showmodal, setShowmodal] = useState(false);
   const handleClose = () => setShowmodal(false);
   const handleShow = () => setShowmodal(true);
+  const [showDelete, setShowdelete] = useState(false);
+  const handleShowDelete = () => setShowdelete(true);
+  const closeDelete = () => setShowdelete(false);
   const [thisPost, setThisPost] = useState();
   const [user, setUser] = useState("email loading");
   const [title, setTitle] = useState("title loading");
@@ -40,7 +47,12 @@ export default function PostPage() {
   useEffect(() => {
     const tempFunc = async () => {
       const thisPost = await getPost(params.id);
+      if (!thisPost) {
+        return console.log("Post not available");
+      }
       const userInfo = await getUserInfo(thisPost.user);
+      const myEmail = await getUserEmail();
+      setMyEmail(myEmail);
       setPostEmail(thisPost.user);
       setThisPost(thisPost);
       setUser(
@@ -69,21 +81,59 @@ export default function PostPage() {
     setAnon(false);
   };
 
+  function refreshPage() {
+    window.location.reload(false);
+  }
+
   async function createComment() {
-    const userEmail = await getUserEmail();
+    const userEmail = myEmail;
     const userInfo = await getUserInfo(userEmail);
     const commentId = await newComment(userEmail, commentbody);
     const docRef = await getRawPost(params.id);
-    const comments = userInfo.comments;
-    setUserInfo(userEmail, "comments", [...comments, commentId]);
+    const comments = thisPost.comments;
+    await setUserInfo(userEmail, "comments", [...comments, commentId]);
 
     await updateDoc(docRef, { comments: [...comments, commentId] });
+    if (myEmail != userEmail) {
+      await createUserNotification(postEmail, userEmail, params.id);
+    }
   }
   async function createAnonComment() {
     const commentId = await newComment("Anonymous", commentbody);
     const docRef = await getRawPost(params.id);
 
     await updateDoc(docRef, { comments: [...comments, commentId] });
+    const notif = await createUserNotification(
+      postEmail,
+      "Anonymous",
+      thisPost
+    );
+  }
+
+  async function deletePostComments() {
+    const myInfo = await getUserInfo(myEmail);
+    comments.forEach(async (comment) => {
+      await setUserInfo(
+        myEmail,
+        "comments",
+        myInfo.comments.filter((myComment) => myComment != comment)
+      );
+      await removeComment(comment);
+    });
+  }
+
+  async function deletePost() {
+    await removePost(params.id);
+    const myInfo = await getUserInfo(myEmail);
+    await setUserInfo(
+      myEmail,
+      "posts",
+      myInfo.posts.filter((post) => post != params.id)
+    );
+  }
+
+  if (!thisPost) {
+    return <div>This post is not available!</div>;
   }
 
   return (
@@ -109,6 +159,16 @@ export default function PostPage() {
                 />
               </a>
               <span>{mod}</span>
+              {myEmail === postEmail ? (
+                <span className="float-end">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={handleShowDelete}
+                  >
+                    <DeleteIcon />
+                  </button>
+                </span>
+              ) : null}
               <div className="media-body ml-3">
                 <a className="text-secondary">{user}</a>
                 <small className="text-muted ml-2">{time}</small>
@@ -136,6 +196,29 @@ export default function PostPage() {
           </div>
         </div>
       </div>
+      <Modal show={showDelete} onHide={closeDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Post</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure?{" "}
+          <div>
+            <button
+              className="btn btn-primary m-1"
+              onClick={async () => {
+                await deletePostComments();
+                await deletePost();
+                navigate("/dashboard/discussions");
+              }}
+            >
+              Yes
+            </button>
+            <button className="btn btn-primary m-1" onClick={closeDelete}>
+              No
+            </button>
+          </div>
+        </Modal.Body>
+      </Modal>
       <Modal size="lg" show={showmodal} onHide={handleClose} backdrop="static">
         <Modal.Header closeButton>
           <Modal.Title>New Comment</Modal.Title>
@@ -164,9 +247,10 @@ export default function PostPage() {
             </Button>
             <Button
               variant="primary"
-              onClick={() => {
-                anon ? createAnonComment() : createComment();
+              onClick={async () => {
+                anon ? await createAnonComment() : await createComment();
                 handleClose();
+                refreshPage();
               }}
             >
               Save Changes
@@ -174,7 +258,7 @@ export default function PostPage() {
           </Modal.Footer>
         </Form>
       </Modal>
-      <Comments comments={comments} />
+      <Comments comments={comments} postId={params.id} />
     </>
   );
 }

@@ -14,6 +14,7 @@ import {
   orderBy,
   where,
   onSnapshot,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   ref,
@@ -174,6 +175,15 @@ export async function newPost(user, title, mod, briefDescription, body) {
   }
 }
 
+export async function removePost(postId) {
+  try {
+    const docRef = doc(firestore, "posts", postId);
+    await deleteDoc(docRef);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export async function newComment(user, body) {
   try {
     const docRef = await addDoc(collection(firestore, "comments"), {
@@ -198,6 +208,27 @@ export async function getComment(id) {
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();
     return data;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function removeComment(commentId) {
+  try {
+    const docRef = doc(firestore, "comments", commentId);
+    await deleteDoc(docRef);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function editPostComment(postId, commentId) {
+  try {
+    const docRef = doc(firestore, "posts", postId);
+    const postInfo = await getPost(postId);
+    await updateDoc(docRef, {
+      comments: postInfo.comments.filter((comment) => comment != commentId),
+    });
   } catch (e) {
     console.error(e);
   }
@@ -264,7 +295,43 @@ export async function getUnreadCount(user1, user2) {
     const docSnap = await getDoc(docRef);
     return docSnap.data().unreadCount;
   } catch (e) {
+    console.error("Error reading document: ", e);
+  }
+}
+
+export async function createUserNotification(poster, commenter, postId) {
+  try {
+    const docRef = await addDoc(
+      collection(firestore, "users", poster, "notifications"),
+      {
+        from: commenter,
+        to: poster,
+        postId: postId,
+        createdAt: Timestamp.now(),
+      }
+    );
+    await updateDoc(docRef, { refId: docRef.id });
+    return docRef.id;
+  } catch (e) {
     console.error("Error changing document: ", e);
+  }
+}
+
+export async function getNotifications(poster) {
+  try {
+    const notifRef = collection(firestore, "users", poster, "notifications");
+    const q = query(notifRef, orderBy("createdAt", "desc"));
+    return q;
+  } catch (e) {
+    console.error("Error reading document: " + e);
+  }
+}
+
+export async function removeNotifications(poster, notifId) {
+  try {
+    await deleteDoc(doc(firestore, "users", poster, "notifications", notifId));
+  } catch (e) {
+    console.error("Error deleting document: " + e);
   }
 }
 export default app;

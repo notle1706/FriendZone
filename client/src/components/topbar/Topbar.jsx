@@ -15,12 +15,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import Nav from "react-bootstrap/Nav";
 import { getAuth, signOut } from "firebase/auth";
-import { getUserInfo } from "../../firebase";
+import { getUserInfo, getNotifications } from "../../firebase";
+import { onSnapshot } from "firebase/firestore";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import FriendReq from "../friendreq/FriendReq";
 import Popover from "react-bootstrap/Popover";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Notifs from "../notifs/Notifs";
 
 export function FriendModal(props) {
   return (
@@ -47,13 +49,36 @@ export function FriendModal(props) {
   );
 }
 
+export function NotifModal(props) {
+  return (
+    <Modal
+      {...props}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Notifications
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{props.contents}</Modal.Body>
+      <Modal.Footer>
+        <Button onClick={props.onHide}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
+
 function Topbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState();
   const [friendReq, setFriendReq] = useState([]);
   const [friendModalShow, setFriendModalShow] = useState(false);
+  const [notifModalShow, setNotifModalShow] = useState(false);
   const [ownEmail, setOwnEmail] = useState();
   const [unreadMsg, setUnreadMsg] = useState(0);
+  const [notifData, setNotifData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(
@@ -66,6 +91,19 @@ function Topbar() {
           setFriendReq(info.incFriendReq);
           setOwnEmail(info.email);
           setUnreadMsg(info.unreadMsg);
+          const notifQuery = await getNotifications(user.email);
+          onSnapshot(notifQuery, (notifSnapshot) => {
+            notifSnapshot.forEach((doc) => {
+              let props = {
+                to: doc.data().to,
+                from: doc.data().from,
+                postId: doc.data().postId,
+                notifId: doc.data().refId,
+                closeNotif: () => setNotifModalShow(false),
+              };
+              setNotifData((arr) => [...arr, <Notifs {...props} />]);
+            });
+          });
         } else {
           setLoggedIn(false);
         }
@@ -90,6 +128,14 @@ function Topbar() {
       <Button variant="link" onClick={() => navigate("/dashboard/messages")}>
         Go to your messages
       </Button>
+    </Popover>
+  );
+
+  const popoverNotifs = (
+    <Popover id="popover-positioned-bottom">
+      <Popover.Body>
+        <div>You have no new Notifications!</div>
+      </Popover.Body>
     </Popover>
   );
 
@@ -170,12 +216,28 @@ function Topbar() {
                   </OverlayTrigger>
                 </span>
                 <span>
-                  <button className="btn btn-primary me-3 position-relative">
-                    <Notifications />
-                    <span className="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger">
-                      4<span className="visually-hidden">notifications</span>
-                    </span>
-                  </button>
+                  <OverlayTrigger
+                    trigger={notifData.length === 0 ? "click" : null}
+                    placement="bottom"
+                    overlay={popoverNotifs}
+                  >
+                    <button
+                      className="btn btn-primary me-3 position-relative"
+                      onClick={() => {
+                        return notifData.length === 0
+                          ? null
+                          : setNotifModalShow(true);
+                      }}
+                    >
+                      <Notifications />
+                      {notifData.length === 0 ? null : (
+                        <span className="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger">
+                          {notifData.length}
+                          <span className="visually-hidden">notifications</span>
+                        </span>
+                      )}
+                    </button>
+                  </OverlayTrigger>
                 </span>
               </span>
             </div>
@@ -186,6 +248,11 @@ function Topbar() {
           onHide={() => setFriendModalShow(false)}
           contents={friendReq}
           ownEmail={ownEmail}
+        />
+        <NotifModal
+          show={notifModalShow}
+          onHide={() => setNotifModalShow(false)}
+          contents={notifData.map((notif) => notif)}
         />
         <div
           className="offcanvas offcanvas-start"

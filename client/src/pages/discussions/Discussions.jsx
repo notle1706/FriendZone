@@ -43,6 +43,10 @@ function Discussions() {
     setMod(event.value);
   };
 
+  function refreshPage() {
+    window.location.reload(false);
+  }
+
   useEffect(() => console.log(pageContents), [pageContents]);
 
   async function createPost() {
@@ -244,6 +248,7 @@ function Discussions() {
                     } else {
                       anon ? createAnonPost() : createPost();
                       handleClose();
+                      refreshPage();
                     }
                   }}
                 >

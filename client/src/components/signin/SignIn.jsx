@@ -52,7 +52,7 @@ export default function SignIn(props) {
           })
           .catch((error) => sError(error.message));
       })
-      .catch((error) => sError(error.message));
+      .catch((error) => sError("Please fill in all the fields"));
   };
 
   const login = async () => {
@@ -60,7 +60,7 @@ export default function SignIn(props) {
       .then((userCredentials) => {
         navigate("/dashboard/home");
       })
-      .catch((error) => sError(error.message));
+      .catch((error) => sError("Incorrect email or password!"));
   };
 
   let [authMode, setAuthMode] = useState("signin");

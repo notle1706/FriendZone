@@ -1,9 +1,37 @@
 import React, { useEffect, useState } from "react";
 import "./comments.css";
 import { useNavigate } from "react-router-dom";
-import { getComment, getDate, getUserInfo } from "../../firebase";
+import {
+  getComment,
+  getDate,
+  getUserInfo,
+  getUserEmail,
+  removeComment,
+  setUserInfo,
+  editPostComment,
+} from "../../firebase";
+import Modal from "react-bootstrap/Modal";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 export function CommentsList(props) {
+  const [showDelete, setShowdelete] = useState(false);
+  const handleShowDelete = () => setShowdelete(true);
+  const closeDelete = () => setShowdelete(false);
   const navigate = useNavigate();
+
+  function refreshPage() {
+    window.location.reload(false);
+  }
+  const deleteComment = async () => {
+    await removeComment(props.commentId);
+    const myInfo = await getUserInfo(props.userEmail);
+    await setUserInfo(
+      props.userEmail,
+      "comments",
+      myInfo.comments.filter((comment) => comment != props.commentId)
+    );
+    await editPostComment(props.postId, props.commentId);
+  };
   return (
     <>
       <div className="inner-main-body p-2 p-sm-3 forum-content">
@@ -25,6 +53,16 @@ export function CommentsList(props) {
                         }
                   }
                 />
+                {props.myEmail === props.userEmail ? (
+                  <span className="float-end">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={handleShowDelete}
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </span>
+                ) : null}
               </a>
               <div className="media-body ml-3">
                 <a className="text-secondary">{props.user}</a>
@@ -41,20 +79,50 @@ export function CommentsList(props) {
           </div>
         </div>
       </div>
+      <Modal show={showDelete} onHide={closeDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Comment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure?{" "}
+          <div>
+            <button
+              className="btn btn-primary m-1"
+              onClick={async () => {
+                await deleteComment();
+                refreshPage();
+              }}
+            >
+              Yes
+            </button>
+            <button className="btn btn-primary m-1" onClick={closeDelete}>
+              No
+            </button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 }
 
 export default function Comments(props) {
   const [commentsData, setCommentsdata] = useState([]);
+  const [myEmail, setMyEmail] = useState();
+
   useEffect(() => {
     const testFunction = async () => {
+      const myEmail = await getUserEmail();
+      setMyEmail(myEmail);
+      const postId = props.postId;
       props.comments.forEach((docId) => {
         (async () => {
           const doc = await getComment(docId);
           const userInfo = await getUserInfo(doc.user);
           console.log(doc);
           let props = {
+            postId: postId,
+            commentId: docId,
+            myEmail: myEmail,
             userEmail: doc.user,
             user: doc.user === "Anonymous" ? "Anonymous" : userInfo.displayName,
             profilePic:
