@@ -8,6 +8,9 @@ import {
   getPostsFromUser,
   getUserInfo,
 } from "../../firebase";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ModeCommentIcon from "@mui/icons-material/ModeComment";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export function PostList(props) {
   const navigate = useNavigate();
@@ -47,10 +50,14 @@ export function PostList(props) {
               </div>
               <div className="text-muted small text-center">
                 <span className="d-none d-sm-inline-block">
-                  <i className="far fa-eye"></i> {props.viewCount}
+                  <VisibilityIcon /> {props.viewCount}
                 </span>
                 <span>
-                  <i className="far fa-comment ml-2"></i> {props.commentNo}
+                  <FavoriteIcon />
+                  {props.likeCount}
+                </span>
+                <span>
+                  <ModeCommentIcon /> {props.commentNo}
                 </span>
               </div>
             </div>
@@ -90,6 +97,7 @@ export default function Posts(props) {
               briefDescription: doc.data().briefDescription,
               viewCount: doc.data().viewCount,
               likeCount: doc.data().likeCount,
+              commentNo: doc.data().comments.length,
               mod: doc.data().mod,
               profilePic: userInfo
                 ? userInfo.profilePicture
@@ -132,6 +140,7 @@ export default function Posts(props) {
                 briefDescription: doc.data().briefDescription,
                 viewCount: doc.data().viewCount,
                 likeCount: doc.data().likeCount,
+                commentNo: doc.data().comments.length,
                 mod: doc.data().mod,
                 profilePic: userInfo
                   ? userInfo.profilePicture
@@ -177,6 +186,7 @@ export default function Posts(props) {
                 briefDescription: doc.data().briefDescription,
                 viewCount: doc.data().viewCount,
                 likeCount: doc.data().likeCount,
+                commentNo: doc.data().comments.length,
                 mod: doc.data().mod,
                 profilePic: userInfo
                   ? userInfo.profilePicture
@@ -219,6 +229,7 @@ export default function Posts(props) {
               briefDescription: doc.data().briefDescription,
               viewCount: doc.data().viewCount,
               likeCount: doc.data().likeCount,
+              commentNo: doc.data().comments.length,
               mod: doc.data().mod,
               profilePic: userInfo
                 ? userInfo.profilePicture
