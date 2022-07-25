@@ -69,7 +69,9 @@ export default function SignIn(props) {
       })
       .catch((error) => sError(error.code == 'auth/wrong-password'
         ? "Wrong Password!"
-        : "Email not registered!"));
+        : error.code == 'auth/internal-error'
+          ? "Please enter a Password!"
+          : "Email not registered!"));
   };
 
   let [authMode, setAuthMode] = useState("signin");
