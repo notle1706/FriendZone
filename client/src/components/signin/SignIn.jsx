@@ -51,7 +51,7 @@ export default function SignIn(props) {
         console.log(userCredentials.user.displayName);
         signInWithEmailAndPassword(auth, registerEmail, registerPassword)
           .then((userCredentials) => {
-            navigate("/dashboard/home");
+            navigate("/dashboard/edit");
           })
           .catch((error) => sError(error.message));
       })
