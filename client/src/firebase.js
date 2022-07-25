@@ -57,6 +57,7 @@ export async function addUser(displayName, email) {
       incFriendReq: [],
       unreadMsg: 0,
       likedPosts: [],
+      likedComments: [],
       karma: 0,
     });
     console.log("Document written with ID: ", docRef.id);
