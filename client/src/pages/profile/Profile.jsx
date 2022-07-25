@@ -46,6 +46,7 @@ function Profile() {
   const [picurl, setPicUrl] = useState();
   const [profilePage, setProfilePage] = useState("profile");
   const [userPosts, setUserPosts] = useState();
+  const [karma, setKarma] = useState();
   useEffect(() => {
     const getData = async () => {
       const newUserEmail = await getUserEmail();
@@ -57,6 +58,7 @@ function Profile() {
       setPicUrl(userInfo.profilePicture);
       setUserPosts(userInfo.posts);
       setCommentNo(userInfo.comments.length);
+      setKarma(userInfo.karma);
     };
     getData();
     return () => console.log("get user data cleanup");
@@ -183,7 +185,7 @@ function Profile() {
 
                   <div className="stats">
                     <h6 className="mb-0">Karma</h6>
-                    <span>129</span>
+                    <span>{karma}</span>
                   </div>
                 </div>
               </div>

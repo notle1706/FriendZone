@@ -12,6 +12,7 @@ import {
   createUserNotification,
   removePost,
   removeComment,
+  likePost,
 } from "../../firebase";
 import { updateDoc } from "firebase/firestore";
 import Modal from "react-bootstrap/Modal";
@@ -19,6 +20,9 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Comments from "../../components/comments/Comments";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ModeCommentIcon from "@mui/icons-material/ModeComment";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export default function PostPage() {
   const navigate = useNavigate();
@@ -43,6 +47,8 @@ export default function PostPage() {
   const [profilePic, setProfilePic] = useState();
   const [anon, setAnon] = useState(false);
   const [postEmail, setPostEmail] = useState("");
+  const [like, setLike] = useState();
+  const toggleLike = () => setLike(!like);
 
   useEffect(() => {
     const tempFunc = async () => {
@@ -52,6 +58,8 @@ export default function PostPage() {
       }
       const userInfo = await getUserInfo(thisPost.user);
       const myEmail = await getUserEmail();
+      const thisUserInfo = await getUserInfo(myEmail);
+      setLike(thisUserInfo.likedPosts.includes(params.id));
       setMyEmail(myEmail);
       setPostEmail(thisPost.user);
       setThisPost(thisPost);
@@ -74,6 +82,9 @@ export default function PostPage() {
     tempFunc();
   }, []);
 
+  if (like === null) {
+    return <div>Loading</div>;
+  }
   const handleSetAnon = () => {
     setAnon(!anon);
   };
@@ -159,6 +170,19 @@ export default function PostPage() {
                 />
               </a>
               <span>{mod}</span>
+              <span
+                className={
+                  like ? "float-end d-flex text-primary" : "float-end d-flex"
+                }
+              >
+                <FavoriteIcon
+                  type="button"
+                  onClick={async () => {
+                    await likePost(params.id, myEmail);
+                    toggleLike();
+                  }}
+                />
+              </span>
               {myEmail === postEmail ? (
                 <span className="float-end">
                   <button
@@ -177,10 +201,13 @@ export default function PostPage() {
               </div>
               <div className="text-muted small text-center">
                 <span className="d-none d-sm-inline-block">
-                  <i className="far fa-eye"></i> {viewCount}
+                  <VisibilityIcon /> {viewCount}
                 </span>
                 <span>
-                  <i className="far fa-comment ml-2"></i> {0}
+                  <ModeCommentIcon /> {comments.length}
+                </span>
+                <span>
+                  <FavoriteIcon /> {likeCount}
                 </span>
                 <Button
                   variant="link"

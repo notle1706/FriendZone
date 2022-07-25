@@ -56,10 +56,47 @@ export async function addUser(displayName, email) {
       friendReq: [],
       incFriendReq: [],
       unreadMsg: 0,
+      likedPosts: [],
+      karma: 0,
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
+  }
+}
+
+export async function likePost(postId, userId) {
+  try {
+    const userRef = doc(firestore, "users", userId);
+    const postRef = doc(firestore, "posts", postId);
+    const userInfo = await getDoc(userRef);
+    const postInfo = await getDoc(postRef);
+    const posterRef =
+      postInfo.data().user === "Anonymous"
+        ? null
+        : doc(firestore, "users", postInfo.data().user);
+    const posterInfo =
+      postInfo.data().user === "Anonymous" ? null : await getDoc(posterRef);
+    const likedPosts = userInfo.data().likedPosts;
+    const likeCount = postInfo.data().likeCount;
+    const karma =
+      postInfo.data().user === "Anonymous" ? null : posterInfo.data().karma;
+
+    if (likedPosts.includes(postId)) {
+      await updateDoc(userRef, {
+        likedPosts: likedPosts.filter((posts) => posts != postId),
+      });
+      await updateDoc(postRef, { likeCount: likeCount - 1 });
+      if (posterRef) await updateDoc(posterRef, { karma: karma - 1 });
+    } else {
+      await updateDoc(userRef, {
+        likedPosts: [...likedPosts, postId],
+      });
+      await updateDoc(postRef, { likeCount: likeCount + 1 });
+      if (posterRef) await updateDoc(posterRef, { karma: karma + 1 });
+    }
+  } catch (e) {
+    console.error("Error accessing documents" + e);
   }
 }
 
@@ -175,6 +212,13 @@ export async function newPost(user, title, mod, briefDescription, body) {
   }
 }
 
+export async function updatePostViewcount(id) {
+  const docRef = doc(firestore, "posts", id);
+  const postInfo = await getDoc(docRef);
+  const currviewcount = postInfo.data().viewCount;
+  await updateDoc(docRef, { viewCount: currviewcount + 1 });
+}
+
 export async function removePost(postId) {
   try {
     const docRef = doc(firestore, "posts", postId);
@@ -208,6 +252,47 @@ export async function getComment(id) {
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();
     return data;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function likeComment(userId, commentId) {
+  try {
+    const userRef = doc(firestore, "users", userId);
+    const commentRef = doc(firestore, "comments", commentId);
+    const userInfo = await getDoc(userRef);
+    const commentInfo = await getDoc(commentRef);
+    const commenterRef =
+      commentInfo.data().user === "Anonymous"
+        ? null
+        : doc(firestore, "users", commentInfo.data().user);
+    const commenterInfo =
+      commentInfo.data().user === "Anonymous"
+        ? null
+        : await getDoc(commenterRef);
+    const likedComments = userInfo.data().likedComments;
+    const likeCount = commentInfo.data().likeCount;
+    const karma =
+      commentInfo.data().user === "Anonymous"
+        ? null
+        : commenterInfo.data().karma;
+
+    if (likedComments.includes(commentId)) {
+      await updateDoc(userRef, {
+        likedComments: likedComments.filter(
+          (comments) => comments != commentId
+        ),
+      });
+      await updateDoc(commentRef, { likeCount: likeCount - 1 });
+      if (commenterRef) await updateDoc(commenterRef, { karma: karma - 1 });
+    } else {
+      await updateDoc(userRef, {
+        likedComments: [...likedComments, commentId],
+      });
+      await updateDoc(commentRef, { likeCount: likeCount + 1 });
+      if (commenterRef) await updateDoc(commenterRef, { karma: karma + 1 });
+    }
   } catch (e) {
     console.error(e);
   }

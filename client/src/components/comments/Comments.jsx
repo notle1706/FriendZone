@@ -9,15 +9,22 @@ import {
   removeComment,
   setUserInfo,
   editPostComment,
+  likeComment,
 } from "../../firebase";
 import Modal from "react-bootstrap/Modal";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export function CommentsList(props) {
   const [showDelete, setShowdelete] = useState(false);
   const handleShowDelete = () => setShowdelete(true);
   const closeDelete = () => setShowdelete(false);
   const navigate = useNavigate();
+  const [like, setLike] = useState(props.isLiked);
+  const toggleLike = () => setLike(!like);
+  if (like === null) {
+    return <div>Loading</div>;
+  }
 
   function refreshPage() {
     window.location.reload(false);
@@ -53,17 +60,31 @@ export function CommentsList(props) {
                         }
                   }
                 />
-                {props.myEmail === props.userEmail ? (
-                  <span className="float-end">
-                    <button
-                      className="btn btn-secondary"
-                      onClick={handleShowDelete}
-                    >
-                      <DeleteIcon />
-                    </button>
-                  </span>
-                ) : null}
               </a>
+              <span
+                className={
+                  like ? "float-end d-flex text-primary" : "float-end d-flex"
+                }
+              >
+                <FavoriteIcon
+                  type="button"
+                  onClick={async () => {
+                    await likeComment(props.myEmail, props.commentId);
+                    toggleLike();
+                  }}
+                />
+              </span>
+              {props.myEmail === props.userEmail ? (
+                <span className="float-end">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={handleShowDelete}
+                  >
+                    <DeleteIcon />
+                  </button>
+                </span>
+              ) : null}
+
               <div className="media-body ml-3">
                 <a className="text-secondary">{props.user}</a>
                 <small className="text-muted ml-2">{props.dateCreated}</small>
@@ -72,7 +93,7 @@ export function CommentsList(props) {
               </div>
               <div className="text-muted small text-center">
                 <span>
-                  <i className="far fa-comment ml-2"></i> {props.likeCount}
+                  <FavoriteIcon /> {props.likeCount}
                 </span>
               </div>
             </div>
@@ -112,13 +133,15 @@ export default function Comments(props) {
   useEffect(() => {
     const testFunction = async () => {
       const myEmail = await getUserEmail();
+      const thisUserInfo = await getUserInfo(myEmail);
       setMyEmail(myEmail);
       const postId = props.postId;
       props.comments.forEach((docId) => {
         (async () => {
           const doc = await getComment(docId);
           const userInfo = await getUserInfo(doc.user);
-          console.log(doc);
+          const IsLiked = thisUserInfo.likedComments.includes(docId);
+
           let props = {
             postId: postId,
             commentId: docId,
@@ -132,6 +155,7 @@ export default function Comments(props) {
             dateCreated: getDate(doc.dateCreated.toDate()),
             body: doc.body,
             likeCount: doc.likeCount,
+            isLiked: IsLiked,
           };
           setCommentsdata((arr) => [...arr, <CommentsList {...props} />]);
         })();
